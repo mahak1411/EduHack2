@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(210 25% 7.8431%);
+  --card: hsl(180 6.6667% 97.0588%);
+  --card-foreground: hsl(210 25% 7.8431%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(210 25% 7.8431%);
+  --primary: hsl(215.8 85.4% 52.2%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(261.4 78.6% 54.1%);
+  --secondary-foreground: hsl(0 0% 100%);
+  --muted: hsl(220 14.3% 95.9%);
+  --muted-foreground: hsl(220 8.9% 46.1%);
+  --accent: hsl(159.1 98.4% 20%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(356.3033 90.5579% 54.3137%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(220 13% 91%);
+  --input: hsl(220 13% 91%);
+  --ring: hsl(215.8 85.4% 52.2%);
+  --chart-1: hsl(215.8 85.4% 52.2%);
+  --chart-2: hsl(159.1 98.4% 20%);
+  --chart-3: hsl(42.0290 92.8251% 56.2745%);
+  --chart-4: hsl(147.1429 78.5047% 41.9608%);
+  --chart-5: hsl(341.4894 75.2000% 50.9804%);
+  --sidebar: hsl(180 6.6667% 97.0588%);
+  --sidebar-foreground: hsl(210 25% 7.8431%);
+  --sidebar-primary: hsl(215.8 85.4% 52.2%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(220 14.3% 95.9%);
+  --sidebar-accent-foreground: hsl(215.8 85.4% 52.2%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(215.8 85.4% 52.2%);
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Menlo, monospace;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: hsl(0 0% 0%);
+  --foreground: hsl(200 6.6667% 91.1765%);
+  --card: hsl(228 9.8039% 10%);
+  --card-foreground: hsl(0 0% 85.0980%);
+  --popover: hsl(0 0% 0%);
+  --popover-foreground: hsl(200 6.6667% 91.1765%);
+  --primary: hsl(215.8 85.4% 52.2%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(261.4 78.6% 54.1%);
+  --secondary-foreground: hsl(0 0% 100%);
+  --muted: hsl(0 0% 9.4118%);
+  --muted-foreground: hsl(210 3.3898% 46.2745%);
+  --accent: hsl(159.1 98.4% 20%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(356.3033 90.5579% 54.3137%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(210 5.2632% 14.9020%);
+  --input: hsl(207.6923 27.6596% 18.4314%);
+  --ring: hsl(215.8 85.4% 52.2%);
+  --chart-1: hsl(215.8 85.4% 52.2%);
+  --chart-2: hsl(159.1 98.4% 20%);
+  --chart-3: hsl(42.0290 92.8251% 56.2745%);
+  --chart-4: hsl(147.1429 78.5047% 41.9608%);
+  --chart-5: hsl(341.4894 75.2000% 50.9804%);
+  --sidebar: hsl(228 9.8039% 10%);
+  --sidebar-foreground: hsl(0 0% 85.0980%);
+  --sidebar-primary: hsl(215.8 85.4% 52.2%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(210 5.2632% 14.9020%);
+  --sidebar-accent-foreground: hsl(215.8 85.4% 52.2%);
+  --sidebar-border: hsl(210 5.2632% 14.9020%);
+  --sidebar-ring: hsl(215.8 85.4% 52.2%);
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Menlo, monospace;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-slate-50 text-foreground;
+  }
+}
+
+/* Custom utility classes for the design */
+.text-primary {
+  color: hsl(215.8 85.4% 52.2%);
+}
+
+.text-secondary {
+  color: hsl(261.4 78.6% 54.1%);
+}
+
+.text-accent {
+  color: hsl(159.1 98.4% 20%);
+}
+
+.bg-primary {
+  background-color: hsl(215.8 85.4% 52.2%);
+}
+
+.bg-secondary {
+  background-color: hsl(261.4 78.6% 54.1%);
+}
+
+.bg-accent {
+  background-color: hsl(159.1 98.4% 20%);
+}
+
+.border-primary {
+  border-color: hsl(215.8 85.4% 52.2%);
+}
+
+.border-secondary {
+  border-color: hsl(261.4 78.6% 54.1%);
+}
+
+.border-accent {
+  border-color: hsl(159.1 98.4% 20%);
+}
