@@ -1,0 +1,69 @@
+thank you for the amazing work done so far—the platform is looking really great and the overall UI is solid. However, after testing the tool with all its features and modules, I’ve encountered a few functional issues and minor workflow gaps that I’d like you to fix to ensure the platform works perfectly and is fully responsive. I do not want any major changes to the current design and layout, as I’m largely happy with the theme and UI direction; however, if we can make the interface look even better or more refined without changing the core navigation/structure, I’d appreciate those improvements.
+
+Here’s a list of issues/feature gaps needing your attention:
+
+File Upload Failures:
+
+Please investigate and resolve the ongoing problems with file uploads. Ensure all supported file types (PDF, image, docx, pptx, etc.) consistently upload without errors.
+
+Optimize both drag-and-drop and select-from-device options, and add user feedback if an upload fails (error codes or suggestions).
+
+OCR Between Upload & Paste:
+
+Implement/correct the OCR extraction feature so users can paste text OR upload files, with reliable conversion from image/PDF to editable text.
+
+The experience should be seamless and fail-safe.
+
+Flashcard Generator—Inappropriate Flashcards:
+
+Review/restrict flashcard outputs that may be inappropriate or contextually incorrect, especially with 'CardICType’ flashcards.
+
+Add validation to ensure generated cards are relevant and appropriate for educational purposes.
+
+AI Quizzer (Fill in the Blanks vs. MCQs):
+
+Fix/improve the quiz generation logic so users clearly get ‘fill in the blank’ type questions whenever requested (not just MCQs).
+
+Ensure users can create and practice both types—no missing functionality or bugs.
+
+AI Quizzes—General Functionality:
+
+Test thoroughly: verify quiz creation, execution, answer validation, scoring, and feedback are all working smoothly.
+
+Fix any bugs that prevent full use.
+
+AI Notes—Edit Option Not Working:
+
+The ‘Edit’ option for AI notes is not functioning as expected.
+
+Please resolve so users can edit any generated notes, with changes properly saved and reflected in their library.
+
+Study Library—Not Working & UI Improvements Needed:
+
+The study resource library is not properly loading or displaying resources.
+
+Please fix the library component and make sure it’s responsive, searchable, and loads quickly.
+
+Also, if possible, enhance the UI here to be visually more polished while keeping the current theme intact.
+
+Update Functionality—Recent Activity per User:
+
+Implement or fix the feature that updates user’s recent activity in real time (e.g., newly created flashcards, quizzes taken, notes edited, etc.).
+
+The activity feed should reflect accurate, up-to-date information.
+
+Create New Logo:
+
+Please create a new logo that fits with the current UI theme—make it clean and modern, but do not change any other UI elements.
+
+Final Requests:
+
+I want every feature listed above to be fully functional, tested, and responsive across all devices (mobile, tablet, desktop).
+
+Please do NOT make any broad changes to the rest of the platform—the current approach is great and meets my needs.
+
+UI is good, but if you’re able to add minor refinements (better visuals, spacing, polish), I’d be very happy. But please keep the main style, navigation, and layout as it is.
+
+Let me know if you need clarification or examples for any point. I look forward to seeing these changes implemented so the platform is 100% robust and production-ready!
+
+Thank you!
