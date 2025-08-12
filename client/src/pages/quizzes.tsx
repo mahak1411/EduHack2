@@ -88,7 +88,7 @@ export default function Quizzes() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await apiRequest("POST", "/api/files/upload", formData);
+      const response = await apiRequest("POST", "/api/files/upload", formData, true);
       return response.json();
     },
     onSuccess: (data) => {

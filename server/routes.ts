@@ -53,7 +53,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const file = req.file;
 
+      console.log("Upload request received:");
+      console.log("- User ID:", userId);
+      console.log("- File:", file ? {
+        originalname: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size,
+        path: file.path
+      } : "No file");
+      console.log("- Request body keys:", Object.keys(req.body));
+      console.log("- Request files:", req.files);
+
       if (!file) {
+        console.error("File upload failed: No file in request");
         return res.status(400).json({ message: "No file uploaded" });
       }
 
@@ -67,7 +79,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         extractedText,
       });
 
-      res.json(savedFile);
+      // Clean up the uploaded file after processing
+      await fileService.cleanupFile(file.path);
+      console.log("Successfully processed and cleaned up file:", file.originalname);
+
+      res.json({
+        ...savedFile,
+        extractedText
+      });
     } catch (error) {
       console.error("Error uploading file:", error);
       res.status(500).json({ message: "Failed to upload file" });
@@ -274,6 +293,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching notes:", error);
       res.status(500).json({ message: "Failed to fetch notes" });
+    }
+  });
+
+  app.patch('/api/notes/:noteId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { noteId } = req.params;
+      const { summary } = req.body;
+
+      const updatedNote = await storage.updateNote(noteId, userId, { summary });
+      if (!updatedNote) {
+        return res.status(404).json({ message: "Note not found" });
+      }
+
+      res.json(updatedNote);
+    } catch (error) {
+      console.error("Error updating note:", error);
+      res.status(500).json({ message: "Failed to update note" });
     }
   });
 

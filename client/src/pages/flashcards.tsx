@@ -73,7 +73,7 @@ export default function Flashcards() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await apiRequest("POST", "/api/files/upload", formData);
+      const response = await apiRequest("POST", "/api/files/upload", formData, true);
       return response.json();
     },
     onSuccess: (data) => {
@@ -145,10 +145,10 @@ export default function Flashcards() {
   });
 
   const handleFileSelect = (files: File[]) => {
+    console.log("Files selected in flashcards:", files);
     setSelectedFiles(files);
-    files.forEach(file => {
-      uploadMutation.mutate(file);
-    });
+    // Process files immediately
+    files.forEach(file => uploadMutation.mutate(file));
   };
 
   const handleGenerate = async () => {
@@ -169,6 +169,8 @@ export default function Flashcards() {
       difficulty,
     });
   };
+
+
 
   const exportToPDF = () => {
     toast({

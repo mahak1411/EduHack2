@@ -47,7 +47,7 @@ export interface IStorage {
   createNote(userId: string, noteData: InsertNote): Promise<Note>;
   getUserNotes(userId: string): Promise<Note[]>;
   getNote(noteId: string): Promise<Note | undefined>;
-  updateNote(noteId: string, updates: Partial<InsertNote>): Promise<Note>;
+  updateNote(noteId: string, userId: string, updates: Partial<InsertNote>): Promise<Note | null>;
   deleteNote(noteId: string): Promise<void>;
   
   // File operations
@@ -192,13 +192,13 @@ export class DatabaseStorage implements IStorage {
     return note;
   }
 
-  async updateNote(noteId: string, updates: Partial<InsertNote>): Promise<Note> {
+  async updateNote(noteId: string, userId: string, updates: Partial<InsertNote>): Promise<Note | null> {
     const [note] = await db
       .update(notes)
       .set({ ...updates, updatedAt: new Date() })
-      .where(eq(notes.id, noteId))
+      .where(and(eq(notes.id, noteId), eq(notes.userId, userId)))
       .returning();
-    return note;
+    return note || null;
   }
 
   async deleteNote(noteId: string): Promise<void> {

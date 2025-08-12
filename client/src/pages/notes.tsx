@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Wand2, Download, Save, Edit, Eye, FileText } from "lucide-react";
+import { Wand2, Download, Save, Edit, Eye, FileText, Trash2 } from "lucide-react";
 
 interface Note {
   id: string;
@@ -71,7 +71,7 @@ export default function Notes() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await apiRequest("POST", "/api/files/upload", formData);
+      const response = await apiRequest("POST", "/api/files/upload", formData, true);
       return response.json();
     },
     onSuccess: (data) => {
@@ -169,6 +169,47 @@ export default function Notes() {
       toast({
         title: "Delete failed",
         description: "Failed to delete note",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+
+  const handleEdit = (note: Note) => {
+    setEditingNote(note.id);
+    setEditContent(note.content);
+  };
+
+  const saveEdit = useMutation({
+    mutationFn: async ({ noteId, content }: { noteId: string; content: string }) => {
+      return await apiRequest("PATCH", `/api/notes/${noteId}`, { summary: content });
+    },
+    onSuccess: () => {
+      setEditingNote(null);
+      setEditContent("");
+      queryClient.invalidateQueries({ queryKey: ["/api/notes"] });
+      toast({
+        title: "Note updated",
+        description: "Your changes have been saved",
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Save failed",
+        description: "Failed to save changes",
         variant: "destructive",
       });
     },
@@ -415,54 +456,126 @@ export default function Notes() {
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {notes.map((note: Note) => (
-                            <Card key={note.id} className="border border-slate-200 hover:shadow-md transition-shadow">
-                              <CardContent className="p-4">
-                                <div className="flex items-start justify-between mb-2">
-                                  <h3 className="font-semibold text-slate-900 truncate flex-1">{note.title}</h3>
-                                  <FileText className="text-slate-400 h-4 w-4 ml-2 flex-shrink-0" />
-                                </div>
-                                <p className="text-sm text-slate-600 mb-3 line-clamp-3">
-                                  {note.content.substring(0, 150)}...
-                                </p>
-                                <div className="flex flex-wrap gap-1 mb-3">
-                                  {note.tags.slice(0, 3).map((tag, index) => (
-                                    <span 
-                                      key={index}
-                                      className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded"
+                            editingNote === note.id ? (
+                              <Card key={note.id} className="border border-slate-200 shadow-lg">
+                                <CardHeader className="pb-3">
+                                  <div className="flex justify-between items-center">
+                                    <CardTitle className="text-lg">Editing Note</CardTitle>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setEditingNote(null)}
+                                      data-testid="button-close-edit"
                                     >
-                                      {tag}
-                                    </span>
-                                  ))}
-                                  {note.tags.length > 3 && (
-                                    <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded">
-                                      +{note.tags.length - 3}
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-slate-500 mb-3">
-                                  Updated {new Date(note.updatedAt).toLocaleDateString()}
-                                </p>
-                                <div className="flex space-x-2">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    data-testid={`button-view-note-${note.id}`}
-                                  >
-                                    <Eye className="mr-1 h-3 w-3" />
-                                    View
-                                  </Button>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => exportNote(note)}
-                                    data-testid={`button-export-note-${note.id}`}
-                                  >
-                                    <Download className="mr-1 h-3 w-3" />
-                                    Export
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
+                                      ×
+                                    </Button>
+                                  </div>
+                                </CardHeader>
+                                <CardContent>
+                                  <div className="space-y-4">
+                                    <div>
+                                      <Label htmlFor="edit-title">Title</Label>
+                                      <Input
+                                        id="edit-title"
+                                        value={note.title}
+                                        disabled
+                                        className="bg-gray-50"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="edit-content">Content</Label>
+                                      <Textarea
+                                        id="edit-content"
+                                        value={editContent}
+                                        onChange={(e) => setEditContent(e.target.value)}
+                                        className="min-h-[200px] resize-none"
+                                        placeholder="Edit your note content..."
+                                        data-testid="textarea-edit-note"
+                                      />
+                                    </div>
+                                    <div className="flex space-x-2 justify-end">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setEditingNote(null)}
+                                        data-testid="button-cancel-edit"
+                                      >
+                                        Cancel
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        onClick={() => saveEdit.mutate({ noteId: note.id, content: editContent })}
+                                        disabled={saveEdit.isPending}
+                                        className="bg-accent text-white hover:bg-emerald-700"
+                                        data-testid="button-save-edit"
+                                      >
+                                        {saveEdit.isPending ? "Saving..." : "Save Changes"}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ) : (
+                              <Card key={note.id} className="border border-slate-200 hover:shadow-md transition-shadow">
+                                <CardContent className="p-4">
+                                  <div className="flex items-start justify-between mb-2">
+                                    <h3 className="font-semibold text-slate-900 truncate flex-1">{note.title}</h3>
+                                    <FileText className="text-slate-400 h-4 w-4 ml-2 flex-shrink-0" />
+                                  </div>
+                                  <p className="text-sm text-slate-600 mb-3 line-clamp-3">
+                                    {note.content.substring(0, 150)}...
+                                  </p>
+                                  <div className="flex flex-wrap gap-1 mb-3">
+                                    {note.tags.slice(0, 3).map((tag, index) => (
+                                      <span 
+                                        key={index}
+                                        className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                    {note.tags.length > 3 && (
+                                      <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded">
+                                        +{note.tags.length - 3}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-slate-500 mb-3">
+                                    Updated {new Date(note.updatedAt).toLocaleDateString()}
+                                  </p>
+                                  <div className="flex space-x-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => handleEdit(note)}
+                                      data-testid={`button-edit-note-${note.id}`}
+                                    >
+                                      <Edit className="mr-1 h-3 w-3" />
+                                      Edit
+                                    </Button>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => exportNote(note)}
+                                      data-testid={`button-export-note-${note.id}`}
+                                    >
+                                      <Download className="mr-1 h-3 w-3" />
+                                      Export
+                                    </Button>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => deleteMutation.mutate(note.id)}
+                                      disabled={deleteMutation.isPending}
+                                      data-testid={`button-delete-note-${note.id}`}
+                                    >
+                                      <Trash2 className="mr-1 h-3 w-3" />
+                                      Delete
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )
                           ))}
                         </div>
                       )}
