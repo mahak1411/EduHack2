@@ -1,6 +1,7 @@
 import { Bell, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Logo from "@/components/ui/logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,10 +24,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
-                <i className="fas fa-brain text-white text-sm"></i>
-              </div>
-              <h1 className="text-xl font-bold text-slate-900">StudyAI</h1>
+              <Logo size="md" />
             </div>
           </div>
           <div className="flex items-center space-x-4">

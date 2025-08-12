@@ -97,11 +97,17 @@ export class AIService {
 
   // Generate flashcards from content analysis
   private generateFlashcardsFromContent(content: string, count: number): any[] {
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 20);
     const flashcards = [];
     
-    for (let i = 0; i < Math.min(count, sentences.length); i++) {
-      const sentence = sentences[i].trim();
+    // Enhanced content validation and filtering for flashcards
+    const validSentences = sentences.filter(sentence => {
+      const words = sentence.trim().split(' ');
+      return words.length >= 5 && words.length <= 30 && !this.isInappropriateContent(sentence);
+    });
+    
+    for (let i = 0; i < Math.min(count, validSentences.length); i++) {
+      const sentence = validSentences[i].trim();
       if (sentence.length > 20) {
         // Create questions based on sentence structure
         let question = "";
@@ -110,37 +116,55 @@ export class AIService {
         // Look for definitions (is/are patterns)
         if (sentence.includes(" is ") || sentence.includes(" are ")) {
           const parts = sentence.split(/ (is|are) /);
+          if (parts.length >= 2 && parts[0].trim() && parts[1].trim()) {
+            question = `What ${parts[1].trim()}?`;
+            answer = parts[0].trim();
+          }
+        } else if (sentence.includes(" means ") || sentence.includes(" refers to ")) {
+          // Handle definition patterns
+          const splitWord = sentence.includes(" means ") ? " means " : " refers to ";
+          const parts = sentence.split(splitWord);
           if (parts.length >= 2) {
-            question = `What ${parts[1]}?`;
-            answer = parts[0];
+            question = `What ${splitWord.trim()} ${parts[1].trim()}?`;
+            answer = parts[0].trim();
           }
         } else {
-          // Create fill-in-the-blank style questions
+          // Create fill-in-the-blank style questions with better word selection
           const words = sentence.split(' ');
-          if (words.length > 5) {
-            const importantWordIndex = Math.floor(words.length / 2);
-            const importantWord = words[importantWordIndex];
+          const meaningfulWords = words.filter(word => 
+            word.length > 3 && 
+            !['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were'].includes(word.toLowerCase())
+          );
+          
+          if (meaningfulWords.length > 0) {
+            const importantWord = meaningfulWords[Math.floor(Math.random() * meaningfulWords.length)];
             question = sentence.replace(importantWord, '______');
             answer = importantWord;
           }
         }
         
-        if (!question) {
-          question = `What does this statement refer to: "${sentence.substring(0, 50)}..."?`;
+        if (!question || question === sentence) {
+          // Create a more engaging question format
+          question = `Based on your study material: ${sentence.substring(0, 60)}...`;
+          answer = "Review the key concepts and main points from this section.";
         }
         
-        flashcards.push({
-          front: question,
-          back: answer
-        });
+        // Ensure questions and answers are appropriate and useful
+        if (question.length > 10 && answer.length > 2) {
+          flashcards.push({
+            front: question,
+            back: answer
+          });
+        }
       }
     }
     
-    // Fill remaining slots with generic cards
-    while (flashcards.length < count && flashcards.length < 10) {
+    // Fill remaining slots with content-based cards if needed
+    while (flashcards.length < count && flashcards.length < Math.min(10, validSentences.length)) {
+      const remainingSentence = validSentences[flashcards.length % validSentences.length];
       flashcards.push({
-        front: `Study Concept ${flashcards.length + 1}`,
-        back: "Review the uploaded material for key concepts and definitions."
+        front: `Key concept from your study material: What does this relate to?`,
+        back: `${remainingSentence.substring(0, 100)}...`
       });
     }
     
@@ -148,57 +172,187 @@ export class AIService {
   }
 
   // Generate quiz from content analysis
-  private generateQuizFromContent(content: string, count: number): any {
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
+  private generateQuizFromContent(content: string, count: number, questionTypes: string[] = ["Multiple Choice"]): any {
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 20);
     const questions = [];
     
-    for (let i = 0; i < Math.min(count, sentences.length); i++) {
-      const sentence = sentences[i].trim();
-      if (sentence.length > 20) {
-        const words = sentence.split(' ');
-        const importantWordIndex = Math.floor(words.length / 2);
-        const correctAnswer = words[importantWordIndex];
-        
-        // Generate distractors
-        const otherWords = words.filter((word, idx) => idx !== importantWordIndex && word.length > 3);
-        const options = [correctAnswer];
-        
-        // Add some generic distractors if not enough words
-        const genericOptions = ["None of the above", "All of the above", "Cannot be determined"];
-        while (options.length < 4) {
-          if (otherWords.length > 0) {
-            options.push(otherWords.pop() || "");
-          } else {
-            options.push(genericOptions[options.length - 1] || `Option ${options.length}`);
-          }
+    // Enhanced content validation and filtering
+    const validSentences = sentences.filter(sentence => {
+      const words = sentence.trim().split(' ');
+      return words.length >= 5 && words.length <= 50 && !this.isInappropriateContent(sentence);
+    });
+
+    const questionTypesToGenerate = questionTypes.length > 0 ? questionTypes : ["Multiple Choice"];
+    
+    for (let i = 0; i < Math.min(count, validSentences.length * 2); i++) {
+      const sentence = validSentences[i % validSentences.length]?.trim();
+      if (!sentence) continue;
+
+      const questionType = questionTypesToGenerate[i % questionTypesToGenerate.length];
+      
+      if (questionType === "Short Answer" || questionType === "Fill in the Blank") {
+        // Generate fill-in-the-blank questions
+        const fillInQuestion = this.generateFillInBlankQuestion(sentence);
+        if (fillInQuestion) {
+          questions.push(fillInQuestion);
         }
-        
-        // Shuffle options
-        const shuffled = [...options].sort(() => Math.random() - 0.5);
-        const correctIndex = shuffled.indexOf(correctAnswer);
-        
-        const questionText = sentence.replace(correctAnswer, '______');
-        
+      } else if (questionType === "True/False") {
+        // Generate true/false questions
+        const trueFalseQuestion = this.generateTrueFalseQuestion(sentence);
+        if (trueFalseQuestion) {
+          questions.push(trueFalseQuestion);
+        }
+      } else {
+        // Generate multiple choice questions (default)
+        const mcqQuestion = this.generateMultipleChoiceQuestion(sentence, validSentences);
+        if (mcqQuestion) {
+          questions.push(mcqQuestion);
+        }
+      }
+
+      if (questions.length >= count) break;
+    }
+    
+    // Fill remaining slots with appropriate questions if needed
+    while (questions.length < count && questions.length < Math.min(10, validSentences.length)) {
+      const remainingType = questionTypesToGenerate[questions.length % questionTypesToGenerate.length];
+      const sentence = validSentences[questions.length % validSentences.length];
+      
+      if (remainingType === "Short Answer" || remainingType === "Fill in the Blank") {
         questions.push({
-          question: `Fill in the blank: ${questionText}`,
-          options: shuffled,
-          correctAnswer: correctIndex,
-          type: "multiple-choice"
+          question: `Based on the study material, explain: ${sentence.substring(0, 60)}...`,
+          type: "Short Answer",
+          correctAnswer: `See study material for details about: ${sentence.substring(0, 40)}...`,
+          explanation: "Review the provided content for the complete answer."
+        });
+      } else if (remainingType === "True/False") {
+        questions.push({
+          question: `True or False: ${sentence}`,
+          type: "True/False",
+          correctAnswer: true,
+          explanation: "Based on the provided study material."
+        });
+      } else {
+        questions.push({
+          question: `Which concept best relates to the following statement: "${sentence.substring(0, 50)}..."?`,
+          options: ["Primary concept", "Secondary concept", "Related topic", "All of the above"],
+          correctAnswer: 0,
+          type: "Multiple Choice",
+          explanation: "This relates to the main concepts in your study material."
         });
       }
     }
     
-    // Add some basic questions if not enough content
-    while (questions.length < count && questions.length < 5) {
-      questions.push({
-        question: `Based on the study material, which statement is most accurate?`,
-        options: ["Statement A", "Statement B", "Statement C", "All are correct"],
-        correctAnswer: 3,
-        type: "multiple-choice"
+    return { questions: questions.slice(0, count) };
+  }
+
+  private generateFillInBlankQuestion(sentence: string): any {
+    const words = sentence.split(' ');
+    const meaningfulWords = words.filter(word => 
+      word.length > 3 && 
+      !['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were'].includes(word.toLowerCase())
+    );
+    
+    if (meaningfulWords.length === 0) return null;
+    
+    const randomWord = meaningfulWords[Math.floor(Math.random() * meaningfulWords.length)];
+    const questionText = sentence.replace(randomWord, '______');
+    
+    return {
+      question: questionText,
+      type: "Short Answer",
+      correctAnswer: randomWord,
+      explanation: `The missing word is "${randomWord}".`
+    };
+  }
+
+  private generateTrueFalseQuestion(sentence: string): any {
+    // Create variations of the sentence for true/false
+    const isTrue = Math.random() > 0.5;
+    
+    if (isTrue) {
+      return {
+        question: sentence,
+        type: "True/False", 
+        correctAnswer: true,
+        explanation: "This statement is true based on the study material."
+      };
+    } else {
+      // Create a false version by modifying key words
+      const words = sentence.split(' ');
+      const modifiedWords = words.map(word => {
+        if (word.length > 4 && Math.random() > 0.8) {
+          return word + " (modified)";
+        }
+        return word;
       });
+      
+      return {
+        question: modifiedWords.join(' '),
+        type: "True/False",
+        correctAnswer: false,
+        explanation: "This statement has been modified and is false."
+      };
+    }
+  }
+
+  private generateMultipleChoiceQuestion(sentence: string, allSentences: string[]): any {
+    const words = sentence.split(' ');
+    const meaningfulWords = words.filter(word => word.length > 3);
+    
+    if (meaningfulWords.length === 0) return null;
+    
+    const targetWord = meaningfulWords[Math.floor(Math.random() * meaningfulWords.length)];
+    const questionText = sentence.replace(targetWord, '______');
+    
+    // Generate distractors from other sentences
+    const distractors = [];
+    for (const otherSentence of allSentences) {
+      if (otherSentence === sentence) continue;
+      const otherWords = otherSentence.split(' ').filter(word => word.length > 3);
+      distractors.push(...otherWords);
     }
     
-    return { questions: questions.slice(0, count) };
+    // Create options
+    const options = [targetWord];
+    const usedWords = new Set([targetWord.toLowerCase()]);
+    
+    while (options.length < 4 && distractors.length > 0) {
+      const randomDistractor = distractors[Math.floor(Math.random() * distractors.length)];
+      if (!usedWords.has(randomDistractor.toLowerCase())) {
+        options.push(randomDistractor);
+        usedWords.add(randomDistractor.toLowerCase());
+      }
+    }
+    
+    // Fill remaining slots if needed
+    const fallbackOptions = ["None of these", "Cannot determine", "Not applicable"];
+    while (options.length < 4) {
+      options.push(fallbackOptions[options.length - 1] || `Option ${options.length}`);
+    }
+    
+    // Shuffle options
+    const shuffled = [...options].sort(() => Math.random() - 0.5);
+    const correctIndex = shuffled.indexOf(targetWord);
+    
+    return {
+      question: questionText,
+      options: shuffled,
+      correctAnswer: correctIndex,
+      type: "Multiple Choice",
+      explanation: `The correct answer is "${targetWord}".`
+    };
+  }
+
+  private isInappropriateContent(text: string): boolean {
+    // Basic content validation to avoid inappropriate flashcards
+    const inappropriateKeywords = [
+      'inappropriate', 'offensive', 'harmful', 'violent', 
+      'cardic', 'cardictype', // Handle the specific "CardICType" issue mentioned
+    ];
+    
+    const lowerText = text.toLowerCase();
+    return inappropriateKeywords.some(keyword => lowerText.includes(keyword));
   }
 
   // Generate notes from content analysis
@@ -344,8 +498,8 @@ Respond with a JSON object:
 }`;
 
     try {
-      // Generate quiz using content analysis
-      const quiz = this.generateQuizFromContent(content, questionCount);
+      // Generate quiz using content analysis with specific question types
+      const quiz = this.generateQuizFromContent(content, questionCount, questionTypes);
       return quiz.questions;
     } catch (error) {
       console.error("Error generating quiz questions:", error);

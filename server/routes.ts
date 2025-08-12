@@ -258,6 +258,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Recent activity route
+  app.get('/api/recent-activity', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Get recent items from each category (limit 5 each)
+      const [recentFlashcards, recentQuizzes, recentNotes] = await Promise.all([
+        storage.getUserFlashcardSets(userId),
+        storage.getUserQuizzes(userId),
+        storage.getUserNotes(userId)
+      ]);
+
+      // Combine and sort by creation date
+      const allItems = [
+        ...(recentFlashcards || []).slice(0, 5).map((item: any) => ({
+          ...item,
+          type: 'flashcard'
+        })),
+        ...(recentQuizzes || []).slice(0, 5).map((item: any) => ({
+          ...item, 
+          type: 'quiz'
+        })),
+        ...(recentNotes || []).slice(0, 5).map((item: any) => ({
+          ...item,
+          type: 'note'
+        }))
+      ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+       .slice(0, 6); // Get top 6 most recent
+
+      res.json(allItems);
+    } catch (error) {
+      console.error("Error fetching recent activity:", error);
+      res.status(500).json({ message: "Failed to fetch recent activity" });
+    }
+  });
+
   // Notes routes
   app.post('/api/notes/generate', isAuthenticated, async (req: any, res) => {
     try {
@@ -300,11 +336,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { noteId } = req.params;
-      const { summary } = req.body;
+      const { summary, content, title } = req.body;
 
-      const updatedNote = await storage.updateNote(noteId, userId, { summary });
+      // Update the note with the new content
+      const updateData: any = {};
+      if (content !== undefined) updateData.content = content;
+      if (summary !== undefined) updateData.content = summary; // Support legacy field name
+      if (title !== undefined) updateData.title = title;
+
+      const updatedNote = await storage.updateNote(noteId, userId, updateData);
       if (!updatedNote) {
-        return res.status(404).json({ message: "Note not found" });
+        return res.status(404).json({ message: "Note not found or you don't have permission to edit it" });
       }
 
       res.json(updatedNote);

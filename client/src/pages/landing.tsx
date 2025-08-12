@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Brain, BookOpen, Zap, Users, CheckCircle } from "lucide-react";
+import Logo from "@/components/ui/logo";
 
 export default function Landing() {
   const handleLogin = () => {
@@ -14,10 +15,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
-                <Brain className="text-white text-sm" />
-              </div>
-              <h1 className="text-xl font-bold text-slate-900">StudyAI</h1>
+              <Logo size="md" />
             </div>
             <Button 
               onClick={handleLogin}

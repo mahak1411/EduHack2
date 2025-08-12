@@ -7,6 +7,8 @@ import {
   StickyNote, 
   Library 
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -15,6 +17,53 @@ const navigation = [
   { name: "AI Notes", href: "/notes", icon: StickyNote },
   { name: "Study Library", href: "/library", icon: Library },
 ];
+
+function RecentActivity() {
+  const { data: recentItems, isLoading } = useQuery({
+    queryKey: ['/api/recent-activity'],
+    staleTime: 30000, // Cache for 30 seconds
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center px-3 py-2 text-sm">
+          <div className="w-2 h-2 bg-gray-300 rounded-full mr-3 animate-pulse"></div>
+          <div className="h-4 bg-gray-300 rounded w-24 animate-pulse"></div>
+        </div>
+        <div className="flex items-center px-3 py-2 text-sm">
+          <div className="w-2 h-2 bg-gray-300 rounded-full mr-3 animate-pulse"></div>
+          <div className="h-4 bg-gray-300 rounded w-20 animate-pulse"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!recentItems || recentItems.length === 0) {
+    return (
+      <div className="px-3 py-4 text-xs text-slate-500">
+        Start creating flashcards, quizzes, or notes to see your recent activity here.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      {recentItems.slice(0, 3).map((item: any, index: number) => (
+        <div key={index} className="flex items-center px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md cursor-pointer">
+          <div className={cn(
+            "w-2 h-2 rounded-full mr-3",
+            item.type === 'flashcard' && "bg-blue-500",
+            item.type === 'quiz' && "bg-green-500", 
+            item.type === 'note' && "bg-yellow-500",
+            !item.type && "bg-slate-400"
+          )}></div>
+          <span className="truncate">{item.title || item.name || 'Study Item'}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function Sidebar() {
   const [location, navigate] = useLocation();
@@ -50,16 +99,7 @@ export default function Sidebar() {
           <div className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
             Recent Activity
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center px-3 py-2 text-sm text-slate-600">
-              <div className="w-2 h-2 bg-accent rounded-full mr-3"></div>
-              <span>Biology Flashcards</span>
-            </div>
-            <div className="flex items-center px-3 py-2 text-sm text-slate-600">
-              <div className="w-2 h-2 bg-secondary rounded-full mr-3"></div>
-              <span>Math Quiz Completed</span>
-            </div>
-          </div>
+          <RecentActivity />
         </div>
       </nav>
     </aside>
