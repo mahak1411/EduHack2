@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyAI - AI-Powered Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563EB',
+                        secondary: '#7C3AED',
+                        accent: '#059669',
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-inter">
+    <!-- @COMPONENT: NavigationHeader -->
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-brain text-white text-sm"></i>
+                        </div>
+                        <h1 class="text-xl font-bold text-slate-900">StudyAI</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-bell mr-1"></i>
+                        Notifications
+                    </button>
+                    <div class="relative">
+                        <button class="flex items-center space-x-2 text-slate-700 hover:text-slate-900 px-3 py-2 rounded-md">
+                            <img class="w-8 h-8 rounded-full object-cover" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="User profile" data-mock="true">
+                            <span class="text-sm font-medium" data-bind="user.name">John Doe</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: NavigationHeader -->
+
+    <div class="flex h-screen pt-16">
+        <!-- @COMPONENT: Sidebar -->
+        <aside class="w-64 bg-white shadow-sm border-r border-slate-200 flex-shrink-0">
+            <nav class="mt-6 px-3">
+                <div class="space-y-1">
+                    <a href="#dashboard" class="bg-primary text-white group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
+                        <i class="fas fa-tachometer-alt mr-3 text-sm"></i>
+                        Dashboard
+                    </a>
+                    <a href="#flashcards" class="text-slate-600 hover:bg-slate-50 hover:text-slate-900 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
+                        <i class="fas fa-clone mr-3 text-sm"></i>
+                        AI Flashcards
+                    </a>
+                    <a href="#quizzes" class="text-slate-600 hover:bg-slate-50 hover:text-slate-900 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
+                        <i class="fas fa-question-circle mr-3 text-sm"></i>
+                        AI Quizzes
+                    </a>
+                    <a href="#notes" class="text-slate-600 hover:bg-slate-50 hover:text-slate-900 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
+                        <i class="fas fa-sticky-note mr-3 text-sm"></i>
+                        AI Notes
+                    </a>
+                    <a href="#library" class="text-slate-600 hover:bg-slate-50 hover:text-slate-900 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
+                        <i class="fas fa-book mr-3 text-sm"></i>
+                        Study Library
+                    </a>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t border-slate-200">
+                    <div class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                        Recent Activity
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center px-3 py-2 text-sm text-slate-600">
+                            <div class="w-2 h-2 bg-accent rounded-full mr-3"></div>
+                            <span data-mock="true">Biology Flashcards</span>
+                        </div>
+                        <div class="flex items-center px-3 py-2 text-sm text-slate-600">
+                            <div class="w-2 h-2 bg-secondary rounded-full mr-3"></div>
+                            <span data-mock="true">Math Quiz Completed</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+        <!-- @END_COMPONENT: Sidebar -->
+
+        <!-- @COMPONENT: MainContent -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="p-6">
+                <!-- Welcome Section -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2">Welcome back, <span data-bind="user.firstName">John</span>!</h2>
+                    <p class="text-slate-600">Continue your learning journey with AI-powered study tools.</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clone text-primary text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-slate-600">Flashcard Sets</p>
+                                <p class="text-2xl font-bold text-slate-900" data-bind="stats.flashcardSets">12</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-question-circle text-secondary text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-slate-600">Quizzes Taken</p>
+                                <p class="text-2xl font-bold text-slate-900" data-bind="stats.quizzesTaken">28</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-sticky-note text-accent text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-slate-600">Study Notes</p>
+                                <p class="text-2xl font-bold text-slate-900" data-bind="stats.studyNotes">45</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-trophy text-orange-600 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-slate-600">Study Streak</p>
+                                <p class="text-2xl font-bold text-slate-900" data-bind="stats.studyStreak">7 days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- AI Flashcards Generator -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-md transition-shadow">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-clone text-primary text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-slate-900 mb-2">AI Flashcard Generator</h3>
+                            <p class="text-slate-600 text-sm mb-4">Upload your study materials and generate flashcards instantly with AI.</p>
+                            <button class="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium" data-event="click:navigateToFlashcards">
+                                Generate Flashcards
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Quiz Generator -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-md transition-shadow">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-secondary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-question-circle text-secondary text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-slate-900 mb-2">AI Quiz Generator</h3>
+                            <p class="text-slate-600 text-sm mb-4">Create comprehensive quizzes from your study content automatically.</p>
+                            <button class="w-full bg-secondary text-white px-4 py-2 rounded-lg hover:bg-violet-700 font-medium" data-event="click:navigateToQuizzes">
+                                Create Quiz
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Notes Summarizer -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-md transition-shadow">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-sticky-note text-accent text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-slate-900 mb-2">AI Notes Summarizer</h3>
+                            <p class="text-slate-600 text-sm mb-4">Transform lengthy documents into concise, organized study notes.</p>
+                            <button class="w-full bg-accent text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-medium" data-event="click:navigateToNotes">
+                                Summarize Notes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Progress -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Recent Study Sessions -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Recent Study Sessions</h3>
+                        <div class="space-y-4">
+                            <!-- @MAP: recentSessions.map(session => ( -->
+                            <div class="flex items-center p-3 bg-slate-50 rounded-lg">
+                                <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clone text-primary text-sm"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm font-medium text-slate-900" data-mock="true">Biology Chapter 3 Flashcards</p>
+                                    <p class="text-xs text-slate-500" data-mock="true">2 hours ago • 15 cards reviewed</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-medium text-accent" data-mock="true">85%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-slate-50 rounded-lg">
+                                <div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-question-circle text-secondary text-sm"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm font-medium text-slate-900" data-mock="true">Math Algebra Quiz</p>
+                                    <p class="text-xs text-slate-500" data-mock="true">Yesterday • 20 questions</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-medium text-accent" data-mock="true">92%</div>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                        </div>
+                        <button class="w-full mt-4 text-primary text-sm font-medium hover:text-blue-700">
+                            View All Sessions
+                        </button>
+                    </div>
+
+                    <!-- Study Progress -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Study Progress</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-slate-600">Weekly Goal</span>
+                                    <span class="font-medium text-slate-900" data-bind="progress.weekly">7/10 hours</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2">
+                                    <div class="bg-primary h-2 rounded-full" style="width: 70%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-slate-600">Flashcard Mastery</span>
+                                    <span class="font-medium text-slate-900" data-bind="progress.flashcards">143/200</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2">
+                                    <div class="bg-accent h-2 rounded-full" style="width: 72%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-slate-600">Quiz Accuracy</span>
+                                    <span class="font-medium text-slate-900" data-bind="progress.accuracy">88%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2">
+                                    <div class="bg-secondary h-2 rounded-full" style="width: 88%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Flashcard Generator Section -->
+            <div id="flashcard-section" class="p-6 hidden">
+                <div class="max-w-4xl mx-auto">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">AI Flashcard Generator</h2>
+                        <p class="text-slate-600">Upload your study materials and let AI create personalized flashcards for you.</p>
+                    </div>
+
+                    <!-- File Upload Section -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 mb-6">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Upload Study Material</h3>
+                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-primary transition-colors">
+                            <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-cloud-upload-alt text-slate-400 text-2xl"></i>
+                            </div>
+                            <h4 class="text-lg font-medium text-slate-900 mb-2">Drop your files here</h4>
+                            <p class="text-slate-600 mb-4">Supports PDF, images, and text files up to 10MB</p>
+                            <button class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium" data-event="click:uploadFile">
+                                Choose Files
+                            </button>
+                            <input type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.txt" multiple data-implementation="File upload handling">
+                        </div>
+                    </div>
+
+                    <!-- Generation Options -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 mb-6">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Generation Settings</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Number of Cards</label>
+                                <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option>10 cards</option>
+                                    <option>20 cards</option>
+                                    <option>30 cards</option>
+                                    <option>50 cards</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Card Type</label>
+                                <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option>Question & Answer</option>
+                                    <option>Term & Definition</option>
+                                    <option>Concept & Explanation</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Difficulty Level</label>
+                                <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                                    <option>Beginner</option>
+                                    <option>Intermediate</option>
+                                    <option>Advanced</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="mt-6 bg-primary text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-medium" data-event="click:generateFlashcards">
+                            <i class="fas fa-magic mr-2"></i>
+                            Generate Flashcards
+                        </button>
+                    </div>
+
+                    <!-- Generated Flashcards Preview -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-slate-900">Generated Flashcards</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-slate-600 hover:text-slate-900 px-3 py-1 text-sm">
+                                    <i class="fas fa-edit mr-1"></i>Edit
+                                </button>
+                                <button class="text-slate-600 hover:text-slate-900 px-3 py-1 text-sm">
+                                    <i class="fas fa-download mr-1"></i>Export PDF
+                                </button>
+                                <button class="bg-accent text-white px-4 py-1 rounded text-sm hover:bg-emerald-700">
+                                    <i class="fas fa-save mr-1"></i>Save Set
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Flashcard Preview Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- @MAP: generatedFlashcards.map(card => ( -->
+                            <div class="border border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow" data-mock="true">
+                                <div class="mb-3">
+                                    <div class="text-xs text-slate-500 mb-1">FRONT</div>
+                                    <div class="font-medium text-slate-900">What is photosynthesis?</div>
+                                </div>
+                                <div class="border-t pt-3">
+                                    <div class="text-xs text-slate-500 mb-1">BACK</div>
+                                    <div class="text-slate-700">The process by which plants convert sunlight, carbon dioxide, and water into glucose and oxygen.</div>
+                                </div>
+                            </div>
+                            <div class="border border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow" data-mock="true">
+                                <div class="mb-3">
+                                    <div class="text-xs text-slate-500 mb-1">FRONT</div>
+                                    <div class="font-medium text-slate-900">What are the products of photosynthesis?</div>
+                                </div>
+                                <div class="border-t pt-3">
+                                    <div class="text-xs text-slate-500 mb-1">BACK</div>
+                                    <div class="text-slate-700">Glucose (C₆H₁₂O₆) and oxygen (O₂) are the main products of photosynthesis.</div>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Quiz Generator Section -->
+            <div id="quiz-section" class="p-6 hidden">
+                <div class="max-w-4xl mx-auto">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">AI Quiz Generator</h2>
+                        <p class="text-slate-600">Create comprehensive quizzes from your study materials with various question types.</p>
+                    </div>
+
+                    <!-- Quiz Setup -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 mb-6">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Quiz Configuration</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Quiz Title</label>
+                                <input type="text" placeholder="Enter quiz title..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Number of Questions</label>
+                                <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary">
+                                    <option>5 questions</option>
+                                    <option>10 questions</option>
+                                    <option>15 questions</option>
+                                    <option>20 questions</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Question Types</label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="flex items-center p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                    <input type="checkbox" class="mr-3" checked>
+                                    <div>
+                                        <div class="font-medium text-slate-900">Multiple Choice</div>
+                                        <div class="text-xs text-slate-600">4 options per question</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                    <input type="checkbox" class="mr-3">
+                                    <div>
+                                        <div class="font-medium text-slate-900">True/False</div>
+                                        <div class="text-xs text-slate-600">Binary choice questions</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
+                                    <input type="checkbox" class="mr-3">
+                                    <div>
+                                        <div class="font-medium text-slate-900">Short Answer</div>
+                                        <div class="text-xs text-slate-600">Written responses</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generated Quiz Preview -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 mb-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold text-slate-900">Quiz Preview</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-secondary hover:text-violet-700 px-3 py-1 text-sm font-medium">
+                                    <i class="fas fa-edit mr-1"></i>Edit Questions
+                                </button>
+                                <button class="bg-secondary text-white px-4 py-2 rounded-lg hover:bg-violet-700 font-medium">
+                                    <i class="fas fa-play mr-2"></i>Start Quiz
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quiz Questions -->
+                        <div class="space-y-6">
+                            <!-- @MAP: quizQuestions.map((question, index) => ( -->
+                            <div class="border border-slate-200 rounded-lg p-4" data-mock="true">
+                                <div class="flex items-start mb-3">
+                                    <div class="w-8 h-8 bg-secondary/10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                        <span class="text-secondary font-medium text-sm">1</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-slate-900 mb-3">Which organelle is responsible for photosynthesis in plant cells?</h4>
+                                        <div class="space-y-2">
+                                            <label class="flex items-center p-2 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                                <input type="radio" name="q1" class="mr-3">
+                                                <span class="text-slate-700">Mitochondria</span>
+                                            </label>
+                                            <label class="flex items-center p-2 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                                <input type="radio" name="q1" class="mr-3">
+                                                <span class="text-slate-700">Chloroplast</span>
+                                            </label>
+                                            <label class="flex items-center p-2 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                                <input type="radio" name="q1" class="mr-3">
+                                                <span class="text-slate-700">Nucleus</span>
+                                            </label>
+                                            <label class="flex items-center p-2 rounded-lg hover:bg-slate-50 cursor-pointer">
+                                                <input type="radio" name="q1" class="mr-3">
+                                                <span class="text-slate-700">Endoplasmic Reticulum</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Notes Summarizer Section -->
+            <div id="notes-section" class="p-6 hidden">
+                <div class="max-w-4xl mx-auto">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">AI Notes Summarizer</h2>
+                        <p class="text-slate-600">Transform lengthy documents into concise, well-organized study notes automatically.</p>
+                    </div>
+
+                    <!-- Input Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- Text Input -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                            <h3 class="text-lg font-semibold text-slate-900 mb-4">Input Content</h3>
+                            <div class="space-y-4">
+                                <div class="border-2 border-dashed border-slate-300 rounded-lg p-4">
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-file-upload text-slate-400 text-2xl mb-2"></i>
+                                        <p class="text-slate-600 text-sm">Upload document or paste text below</p>
+                                        <button class="mt-2 text-accent hover:text-emerald-700 text-sm font-medium">Choose File</button>
+                                    </div>
+                                </div>
+                                <div class="text-center text-slate-500 text-sm">OR</div>
+                                <textarea 
+                                    placeholder="Paste your study content here..." 
+                                    class="w-full h-40 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent resize-none"
+                                    data-mock="true"
+                                ></textarea>
+                                <button class="w-full bg-accent text-white py-2 rounded-lg hover:bg-emerald-700 font-medium" data-event="click:generateSummary">
+                                    <i class="fas fa-magic mr-2"></i>Generate Summary
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Summary Options -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                            <h3 class="text-lg font-semibold text-slate-900 mb-4">Summary Settings</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Summary Length</label>
+                                    <select class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+                                        <option>Brief (1-2 paragraphs)</option>
+                                        <option>Medium (3-5 paragraphs)</option>
+                                        <option>Detailed (6+ paragraphs)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Focus Areas</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="mr-2" checked>
+                                            <span class="text-sm text-slate-700">Key Concepts</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="mr-2">
+                                            <span class="text-sm text-slate-700">Important Dates</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="mr-2">
+                                            <span class="text-sm text-slate-700">Formulas & Equations</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="mr-2">
+                                            <span class="text-sm text-slate-700">Examples & Cases</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Output Format</label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <label class="flex items-center p-2 border border-slate-200 rounded cursor-pointer hover:bg-slate-50">
+                                            <input type="radio" name="format" class="mr-2" checked>
+                                            <span class="text-sm">Bullet Points</span>
+                                        </label>
+                                        <label class="flex items-center p-2 border border-slate-200 rounded cursor-pointer hover:bg-slate-50">
+                                            <input type="radio" name="format" class="mr-2">
+                                            <span class="text-sm">Paragraphs</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Generated Summary -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-slate-900">Generated Summary</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-slate-600 hover:text-slate-900 px-3 py-1 text-sm">
+                                    <i class="fas fa-edit mr-1"></i>Edit
+                                </button>
+                                <button class="text-slate-600 hover:text-slate-900 px-3 py-1 text-sm">
+                                    <i class="fas fa-download mr-1"></i>Export
+                                </button>
+                                <button class="bg-accent text-white px-4 py-1 rounded text-sm hover:bg-emerald-700">
+                                    <i class="fas fa-save mr-1"></i>Save Notes
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Summary Content -->
+                        <div class="prose max-w-none" data-mock="true">
+                            <h4 class="text-lg font-semibold text-slate-900 mb-3">Photosynthesis Overview</h4>
+                            <div class="space-y-3 text-slate-700">
+                                <div class="pl-4 border-l-3 border-accent">
+                                    <p class="font-medium text-slate-900">Key Process</p>
+                                    <p>Photosynthesis is the biological process by which plants, algae, and some bacteria convert light energy (usually from sunlight) into chemical energy stored in glucose molecules.</p>
+                                </div>
+                                <div class="pl-4 border-l-3 border-secondary">
+                                    <p class="font-medium text-slate-900">Chemical Equation</p>
+                                    <p>6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂</p>
+                                </div>
+                                <div class="pl-4 border-l-3 border-primary">
+                                    <p class="font-medium text-slate-900">Main Components</p>
+                                    <ul class="list-disc list-inside space-y-1 mt-1">
+                                        <li>Chloroplasts: Organelles where photosynthesis occurs</li>
+                                        <li>Chlorophyll: Green pigment that captures light energy</li>
+                                        <li>Stomata: Pores that allow gas exchange</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- @END_COMPONENT: MainContent -->
+    </div>
+
+    <script>
+        // @STATE: currentSection:string = 'dashboard'
+        // @STATE: uploadedFiles:array = []
+        // @STATE: generatedContent:object = {}
+        
+        (function() {
+            // Simple navigation handling
+            const navLinks = document.querySelectorAll('aside a[href^="#"]');
+            const sections = {
+                '#dashboard': 'dashboard-section',
+                '#flashcards': 'flashcard-section', 
+                '#quizzes': 'quiz-section',
+                '#notes': 'notes-section',
+                '#library': 'dashboard-section' // Placeholder
+            };
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    showSection(sections[targetId] || 'dashboard-section');
+                    
+                    // Update active nav state
+                    navLinks.forEach(l => l.classList.remove('bg-primary', 'text-white'));
+                    navLinks.forEach(l => l.classList.add('text-slate-600', 'hover:bg-slate-50', 'hover:text-slate-900'));
+                    this.classList.remove('text-slate-600', 'hover:bg-slate-50', 'hover:text-slate-900');
+                    this.classList.add('bg-primary', 'text-white');
+                });
+            });
+
+            function showSection(sectionId) {
+                // Hide all sections
+                document.querySelectorAll('#dashboard-section, #flashcard-section, #quiz-section, #notes-section')
+                    .forEach(section => section.classList.add('hidden'));
+                
+                // Show target section
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                }
+            }
+
+            // Quick action buttons
+            document.querySelectorAll('[data-event^="click:navigate"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-event');
+                    if (action.includes('Flashcards')) {
+                        showSection('flashcard-section');
+                        // Update nav
+                        navLinks.forEach(l => l.classList.remove('bg-primary', 'text-white'));
+                        navLinks.forEach(l => l.classList.add('text-slate-600', 'hover:bg-slate-50', 'hover:text-slate-900'));
+                        document.querySelector('a[href="#flashcards"]').classList.add('bg-primary', 'text-white');
+                        document.querySelector('a[href="#flashcards"]').classList.remove('text-slate-600', 'hover:bg-slate-50', 'hover:text-slate-900');
+                    } else if (action.includes('Quizzes')) {
+                        showSection('quiz-section');
+                        // Update nav
+                        navLinks.forEach(l => l.classList.remove('bg-primary', 'text-white'));
+                        navLinks.forEach(l => l.classList.add('text-slate-600', 'hover:bg-slate-50', 'hover:text-slate-900'));
+                        document.querySelector('a[href="#quizzes"]').classList.add('bg-primary', 'text-white');
+                        document.querySelector('a[href="#quizzes"]').classList.remove('text-slate-600', 'hover:bg-slate-50', 'hover:text-slate-900');
+                    } else if (action.includes('Notes')) {
+                        showSection('notes-section');
+                        // Update nav
+                        navLinks.forEach(l => l.classList.remove('bg-primary', 'text-white'));
+                        navLinks.forEach(l => l.classList.add('text-slate-600', 'hover:bg-slate-50', 'hover:text-slate-900'));
+                        document.querySelector('a[href="#notes"]').classList.add('bg-primary', 'text-white');
+                        document.querySelector('a[href="#notes"]').classList.remove('text-slate-600', 'hover:bg-slate-50', 'hover:text-slate-900');
+                    }
+                });
+            });
+
+            // TODO: Implement file upload handling
+            // TODO: Implement AI API integration for content generation
+            // TODO: Implement real-time content processing and display
+            // TODO: Implement export functionality (PDF, Anki)
+            // TODO: Implement user progress tracking and analytics
+            // TODO: Implement local storage for user preferences
+        })();
+    </script>
+</body>
+</html>
