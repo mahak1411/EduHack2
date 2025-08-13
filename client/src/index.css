@@ -39,6 +39,11 @@
     --gradient-secondary: linear-gradient(135deg, hsl(195 100% 70%) 0%, hsl(270 91% 65%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(15 100% 70%) 0%, hsl(25 100% 65%) 100%);
     
+    /* Tool card specific gradients */
+    --gradient-flashcard: linear-gradient(135deg, hsl(270 91% 65%) 0%, hsl(285 100% 70%) 100%);
+    --gradient-quiz: linear-gradient(135deg, hsl(195 100% 70%) 0%, hsl(220 85% 65%) 100%);
+    --gradient-notes: linear-gradient(135deg, hsl(150 100% 70%) 0%, hsl(165 85% 65%) 100%);
+    
     --chart-1: 270 91% 65%;
     --chart-2: 195 100% 70%;
     --chart-3: 15 100% 70%;
@@ -124,6 +129,93 @@
   
   .gradient-accent {
     background: var(--gradient-accent);
+  }
+  
+  .gradient-flashcard {
+    background: var(--gradient-flashcard);
+  }
+  
+  .gradient-quiz {
+    background: var(--gradient-quiz);
+  }
+  
+  .gradient-notes {
+    background: var(--gradient-notes);
+  }
+  
+  /* Modern card styles */
+  .tool-card {
+    @apply bg-white/90 backdrop-blur-md border border-slate-200/60 shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out;
+  }
+  
+  .tool-card:hover {
+    @apply -translate-y-2 scale-[1.02];
+  }
+  
+  .tool-card-icon {
+    @apply w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 transition-transform duration-300 ease-in-out;
+  }
+  
+  .tool-card:hover .tool-card-icon {
+    @apply rotate-6 scale-110;
+  }
+  
+  .tool-card-title {
+    @apply text-2xl font-bold text-slate-900 mb-4 tracking-tight;
+  }
+  
+  .tool-card-description {
+    @apply text-slate-600 text-base mb-6 leading-relaxed font-medium;
+  }
+  
+  .tool-card-button {
+    @apply w-full px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 transform active:scale-95;
+  }
+  
+  /* Micro-interactions */
+  .glow-on-hover {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .glow-on-hover:hover {
+    @apply shadow-2xl;
+    box-shadow: 0 20px 40px -10px rgba(var(--primary), 0.3);
+  }
+  
+  /* Loading states */
+  .loading-shimmer {
+    @apply animate-pulse;
+    background: linear-gradient(90deg, 
+      hsl(var(--muted)) 25%, 
+      hsl(var(--muted-foreground) / 0.1) 50%, 
+      hsl(var(--muted)) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  /* Modern profile dropdown */
+  .profile-dropdown {
+    @apply bg-white/95 backdrop-blur-md shadow-2xl border-0 rounded-2xl p-2;
+  }
+  
+  .profile-dropdown-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-slate-50/80;
+  }
+  
+  /* Typography improvements */
+  .modern-heading {
+    @apply font-bold tracking-tight;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  
+  .modern-body {
+    @apply font-medium leading-relaxed;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
   
   /* Modern button styles */

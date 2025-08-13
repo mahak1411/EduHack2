@@ -84,84 +84,100 @@ export default function Dashboard() {
       <Header />
       <div className="flex h-screen pt-16">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-8">
+        <main className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className="p-4 sm:p-6 lg:p-8">
             {/* Modern Welcome Section */}
             <div className="text-center mb-12">
-              <div className="flex items-center justify-center gap-3 mb-6">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center float-animation pulse-glow">
-                  <Brain className="h-8 w-8 text-white" />
+              <div className="flex items-center justify-center gap-3 mb-8">
+                <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center float-animation pulse-glow shadow-2xl">
+                  <Brain className="h-10 w-10 text-white" />
                 </div>
               </div>
-              <h1 className="text-6xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-4">
-                Welcome back, {user?.firstName || user?.email?.split('@')[0] || "Amazing Learner"}! ✨
+              <h1 className="text-5xl lg:text-6xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-6 modern-heading tracking-tight">
+                Welcome back, {user?.firstName || user?.email?.split('@')[0] || "Amazing Learner"}!
               </h1>
-              <p className="text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-                Continue your AI-powered learning journey. Create, study, and master knowledge like never before! 🚀
+              <p className="text-xl lg:text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed modern-body font-medium">
+                Continue your AI-powered learning journey. Create, study, and master knowledge like never before with our advanced educational tools.
               </p>
             </div>
 
             {/* Modern Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-              <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 hover:scale-105 transition-transform duration-300 shadow-xl">
-                <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 shadow-xl glow-on-hover rounded-2xl">
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-purple-100 text-sm font-medium mb-2">💳 Flashcard Sets</p>
-                      <p className="text-4xl font-bold" data-testid="stat-flashcard-sets">
-                        {statsLoading ? "..." : stats?.flashcardSets || 0}
+                      <p className="text-purple-100 text-sm font-semibold mb-2 modern-body">Flashcard Sets</p>
+                      <p className="text-3xl font-bold modern-heading" data-testid="stat-flashcard-sets">
+                        {statsLoading ? (
+                          <div className="loading-shimmer w-12 h-8 rounded" />
+                        ) : (
+                          stats?.flashcardSets || 0
+                        )}
                       </p>
                     </div>
-                    <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center">
-                      <BookOpen className="h-8 w-8 text-white" />
+                    <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                      <BookOpen className="h-7 w-7 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-emerald-500 to-green-600 text-white border-0 hover:scale-105 transition-transform duration-300 shadow-xl">
-                <CardContent className="p-8">
+              <Card className="bg-gradient-to-br from-blue-500 to-cyan-600 text-white border-0 hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 shadow-xl glow-on-hover rounded-2xl">
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-emerald-100 text-sm font-medium mb-2">🧠 Quizzes Taken</p>
-                      <p className="text-4xl font-bold" data-testid="stat-quizzes-taken">
-                        {statsLoading ? "..." : stats?.quizzesTaken || 0}
+                      <p className="text-blue-100 text-sm font-semibold mb-2 modern-body">Quizzes Taken</p>
+                      <p className="text-3xl font-bold modern-heading" data-testid="stat-quizzes-taken">
+                        {statsLoading ? (
+                          <div className="loading-shimmer w-12 h-8 rounded" />
+                        ) : (
+                          stats?.quizzesTaken || 0
+                        )}
                       </p>
                     </div>
-                    <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center">
-                      <HelpCircle className="h-8 w-8 text-white" />
+                    <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                      <HelpCircle className="h-7 w-7 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-blue-500 to-cyan-600 text-white border-0 hover:scale-105 transition-transform duration-300 shadow-xl">
-                <CardContent className="p-8">
+              <Card className="bg-gradient-to-br from-green-500 to-emerald-600 text-white border-0 hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 shadow-xl glow-on-hover rounded-2xl">
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-blue-100 text-sm font-medium mb-2">📝 Study Notes</p>
-                      <p className="text-4xl font-bold" data-testid="stat-study-notes">
-                        {statsLoading ? "..." : stats?.studyNotes || 0}
+                      <p className="text-green-100 text-sm font-semibold mb-2 modern-body">Study Notes</p>
+                      <p className="text-3xl font-bold modern-heading" data-testid="stat-study-notes">
+                        {statsLoading ? (
+                          <div className="loading-shimmer w-12 h-8 rounded" />
+                        ) : (
+                          stats?.studyNotes || 0
+                        )}
                       </p>
                     </div>
-                    <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center">
-                      <StickyNote className="h-8 w-8 text-white" />
+                    <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                      <StickyNote className="h-7 w-7 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-orange-500 to-pink-600 text-white border-0 hover:scale-105 transition-transform duration-300 shadow-xl">
-                <CardContent className="p-8">
+              <Card className="bg-gradient-to-br from-orange-500 to-pink-600 text-white border-0 hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 shadow-xl glow-on-hover rounded-2xl">
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-orange-100 text-sm font-medium mb-2">🏆 Avg Quiz Score</p>
-                      <p className="text-4xl font-bold" data-testid="stat-avg-score">
-                        {statsLoading ? "..." : `${Math.round(stats?.avgQuizScore || 0)}%`}
+                      <p className="text-orange-100 text-sm font-semibold mb-2 modern-body">Avg Quiz Score</p>
+                      <p className="text-3xl font-bold modern-heading" data-testid="stat-avg-score">
+                        {statsLoading ? (
+                          <div className="loading-shimmer w-16 h-8 rounded" />
+                        ) : (
+                          `${Math.round(stats?.avgQuizScore || 0)}%`
+                        )}
                       </p>
                     </div>
-                    <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center">
-                      <Trophy className="h-8 w-8 text-white" />
+                    <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                      <Trophy className="h-7 w-7 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -173,96 +189,111 @@ export default function Dashboard() {
               <ComprehensiveGenerator />
             </div>
 
-            {/* Modern Quick Actions */}
+            {/* Modern AI Tools Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              <Card className="bg-white/80 backdrop-blur-sm border-2 border-purple-200 hover:shadow-2xl hover:scale-105 transition-all duration-300 group">
-                <CardContent className="p-8 text-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-6 transition-transform">
+              {/* Flashcard Generator Card */}
+              <Card className="tool-card rounded-3xl p-8 text-center group border-2 border-purple-100">
+                <CardContent className="p-0">
+                  <div className="tool-card-icon gradient-flashcard">
                     <BookOpen className="text-white h-10 w-10" />
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">🎯 AI Flashcard Generator</h3>
-                  <p className="text-slate-600 text-base mb-6 leading-relaxed">
-                    Upload your study materials and generate interactive flashcards instantly with advanced AI.
+                  <h3 className="tool-card-title modern-heading">
+                    AI Flashcard Generator
+                  </h3>
+                  <p className="tool-card-description modern-body">
+                    Upload your study materials and generate interactive flashcards instantly with advanced AI technology.
                   </p>
                   <Button 
                     onClick={() => navigate("/flashcards")}
-                    className="w-full bg-primary text-white hover:bg-blue-700"
+                    className="tool-card-button bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 glow-on-hover"
                     data-testid="button-generate-flashcards"
                   >
                     Generate Flashcards
+                    <Sparkles className="ml-2 h-4 w-4" />
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card className="border border-slate-200 hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-secondary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <HelpCircle className="text-secondary h-8 w-8" />
+              {/* Quiz Generator Card */}
+              <Card className="tool-card rounded-3xl p-8 text-center group border-2 border-blue-100">
+                <CardContent className="p-0">
+                  <div className="tool-card-icon gradient-quiz">
+                    <HelpCircle className="text-white h-10 w-10" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">AI Quiz Generator</h3>
-                  <p className="text-slate-600 text-sm mb-4">
-                    Create comprehensive quizzes from your study content automatically.
+                  <h3 className="tool-card-title modern-heading">
+                    AI Quiz Generator
+                  </h3>
+                  <p className="tool-card-description modern-body">
+                    Create comprehensive quizzes from your study content automatically with intelligent question generation.
                   </p>
                   <Button 
                     onClick={() => navigate("/quizzes")}
-                    className="w-full bg-secondary text-white hover:bg-violet-700"
+                    className="tool-card-button bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 glow-on-hover"
                     data-testid="button-create-quiz"
                   >
                     Create Quiz
+                    <Target className="ml-2 h-4 w-4" />
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card className="border border-slate-200 hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <StickyNote className="text-accent h-8 w-8" />
+              {/* Notes Summarizer Card */}
+              <Card className="tool-card rounded-3xl p-8 text-center group border-2 border-green-100">
+                <CardContent className="p-0">
+                  <div className="tool-card-icon gradient-notes">
+                    <StickyNote className="text-white h-10 w-10" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">AI Notes Summarizer</h3>
-                  <p className="text-slate-600 text-sm mb-4">
-                    Transform lengthy documents into concise, organized study notes.
+                  <h3 className="tool-card-title modern-heading">
+                    AI Notes Summarizer
+                  </h3>
+                  <p className="tool-card-description modern-body">
+                    Transform lengthy documents into concise, organized study notes with smart summarization algorithms.
                   </p>
                   <Button 
                     onClick={() => navigate("/notes")}
-                    className="w-full bg-accent text-white hover:bg-emerald-700"
+                    className="tool-card-button bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 glow-on-hover"
                     data-testid="button-summarize-notes"
                   >
                     Summarize Notes
+                    <Zap className="ml-2 h-4 w-4" />
                   </Button>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Study Progress */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border border-slate-200">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Stats</h3>
-                  <div className="space-y-4">
+            {/* Study Progress & Getting Started */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <Card className="bg-white/90 backdrop-blur-md border border-slate-200/60 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl glow-on-hover">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6 modern-heading flex items-center">
+                    <TrendingUp className="mr-3 h-6 w-6 text-purple-600" />
+                    Quick Stats
+                  </h3>
+                  <div className="space-y-6">
                     <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-slate-600">Total Study Materials</span>
-                        <span className="font-medium text-slate-900">
+                      <div className="flex justify-between text-sm mb-3">
+                        <span className="text-slate-600 font-medium modern-body">Total Study Materials</span>
+                        <span className="font-bold text-slate-900 text-lg modern-heading">
                           {((stats?.flashcardSets || 0) + (stats?.studyNotes || 0))}
                         </span>
                       </div>
-                      <div className="w-full bg-slate-200 rounded-full h-2">
+                      <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
                         <div 
-                          className="bg-primary h-2 rounded-full" 
+                          className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500 ease-out" 
                           style={{ width: "70%" }}
                         ></div>
                       </div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-slate-600">Quiz Performance</span>
-                        <span className="font-medium text-slate-900">
+                      <div className="flex justify-between text-sm mb-3">
+                        <span className="text-slate-600 font-medium modern-body">Quiz Performance</span>
+                        <span className="font-bold text-slate-900 text-lg modern-heading">
                           {Math.round(stats?.avgQuizScore || 0)}%
                         </span>
                       </div>
-                      <div className="w-full bg-slate-200 rounded-full h-2">
+                      <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
                         <div 
-                          className="bg-accent h-2 rounded-full" 
+                          className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-500 ease-out" 
                           style={{ width: `${Math.round(stats?.avgQuizScore || 0)}%` }}
                         ></div>
                       </div>
@@ -271,35 +302,38 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="border border-slate-200">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-slate-900 mb-4">Getting Started</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center p-3 bg-slate-50 rounded-lg">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                        <span className="text-primary font-medium text-sm">1</span>
+              <Card className="bg-white/90 backdrop-blur-md border border-slate-200/60 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl glow-on-hover">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-6 modern-heading flex items-center">
+                    <Sparkles className="mr-3 h-6 w-6 text-blue-600" />
+                    Getting Started
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl hover:shadow-md transition-all duration-200">
+                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-sm modern-heading">1</span>
                       </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-slate-900">Upload study materials</p>
-                        <p className="text-xs text-slate-500">PDF, images, or text files</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center p-3 bg-slate-50 rounded-lg">
-                      <div className="w-8 h-8 bg-secondary/10 rounded-full flex items-center justify-center">
-                        <span className="text-secondary font-medium text-sm">2</span>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-slate-900">Generate study tools</p>
-                        <p className="text-xs text-slate-500">Flashcards, quizzes, or notes</p>
+                      <div className="ml-4">
+                        <p className="text-sm font-semibold text-slate-900 modern-heading">Upload study materials</p>
+                        <p className="text-xs text-slate-500 modern-body">PDF, images, or text files</p>
                       </div>
                     </div>
-                    <div className="flex items-center p-3 bg-slate-50 rounded-lg">
-                      <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center">
-                        <span className="text-accent font-medium text-sm">3</span>
+                    <div className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl hover:shadow-md transition-all duration-200">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-sm modern-heading">2</span>
                       </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-slate-900">Study and track progress</p>
-                        <p className="text-xs text-slate-500">Review and improve</p>
+                      <div className="ml-4">
+                        <p className="text-sm font-semibold text-slate-900 modern-heading">Generate study tools</p>
+                        <p className="text-xs text-slate-500 modern-body">Flashcards, quizzes, or notes</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl hover:shadow-md transition-all duration-200">
+                      <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-sm modern-heading">3</span>
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-sm font-semibold text-slate-900 modern-heading">Study and track progress</p>
+                        <p className="text-xs text-slate-500 modern-body">Review and improve</p>
                       </div>
                     </div>
                   </div>

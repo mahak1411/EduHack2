@@ -41,7 +41,7 @@ function RecentActivity() {
     );
   }
 
-  if (!recentItems || recentItems.length === 0) {
+  if (!recentItems || !Array.isArray(recentItems) || recentItems.length === 0) {
     return (
       <div className="px-3 py-4 text-xs text-slate-500">
         Start creating flashcards, quizzes, or notes to see your recent activity here.
@@ -71,9 +71,9 @@ export default function Sidebar() {
   const [location, navigate] = useLocation();
 
   return (
-    <aside className="w-64 bg-white shadow-sm border-r border-slate-200 flex-shrink-0">
+    <aside className="w-64 bg-white/90 backdrop-blur-md shadow-lg border-r border-slate-200/60 flex-shrink-0">
       <nav className="mt-6 px-3">
-        <div className="space-y-1">
+        <div className="space-y-2">
           {navigation.map((item) => {
             const isActive = location === item.href;
             const Icon = item.icon;
@@ -83,22 +83,28 @@ export default function Sidebar() {
                 key={item.name}
                 onClick={() => navigate(item.href)}
                 className={cn(
-                  "w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                  "w-full group flex items-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 modern-body",
                   isActive
-                    ? "bg-primary text-white"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg glow-on-hover"
+                    : "text-slate-600 hover:bg-slate-50/80 hover:text-slate-900 hover:shadow-md"
                 )}
                 data-testid={`nav-${item.name.toLowerCase().replace(" ", "-")}`}
               >
-                <Icon className="mr-3 h-4 w-4" />
-                {item.name}
+                <Icon className={cn(
+                  "mr-3 h-5 w-5 transition-all duration-200",
+                  isActive ? "text-white" : "text-slate-500 group-hover:text-slate-700"
+                )} />
+                <span className="tracking-wide">{item.name}</span>
+                {isActive && (
+                  <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse" />
+                )}
               </button>
             );
           })}
         </div>
         
-        <div className="mt-8 pt-6 border-t border-slate-200">
-          <div className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+        <div className="mt-8 pt-6 border-t border-slate-200/60">
+          <div className="px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 modern-heading">
             Recent Activity
           </div>
           <RecentActivity />
