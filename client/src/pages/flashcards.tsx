@@ -14,7 +14,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wand2, Download, Save, Edit, Eye } from "lucide-react";
+import { Wand2, Download, Save, Edit, Eye, Upload, Sparkles, BookOpen, Plus } from "lucide-react";
+import ErrorMessage from "@/components/ui/error-message";
 
 interface FlashcardSet {
   id: string;
@@ -45,6 +46,7 @@ export default function Flashcards() {
   const [cardCount, setCardCount] = useState("10");
   const [cardType, setCardType] = useState("Question & Answer");
   const [difficulty, setDifficulty] = useState("Intermediate");
+  const [error, setError] = useState<string>("");
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -152,12 +154,15 @@ export default function Flashcards() {
   };
 
   const handleGenerate = async () => {
+    setError("");
+    
     if (!textContent.trim()) {
-      toast({
-        title: "No content",
-        description: "Please upload a file or enter text content",
-        variant: "destructive",
-      });
+      setError("Please upload a file or enter text content to generate flashcards");
+      return;
+    }
+
+    if (textContent.trim().length < 50) {
+      setError("Content is too short. Please provide at least 50 characters of study material");
       return;
     }
 
@@ -193,29 +198,56 @@ export default function Flashcards() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       <Header />
       <div className="flex h-screen pt-16">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-6">
+        <main className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className="p-4 sm:p-6 lg:p-8">
             <div className="max-w-6xl mx-auto">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">AI Flashcard Generator</h2>
-                <p className="text-slate-600">Upload your study materials and let AI create personalized flashcards for you.</p>
+              {/* Modern Header Section */}
+              <div className="mb-8 text-center">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl float-animation">
+                    <BookOpen className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+                <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-4 modern-heading">
+                  AI Flashcard Generator
+                </h1>
+                <p className="text-xl text-slate-600 max-w-3xl mx-auto modern-body">
+                  Upload your study materials and let AI create personalized flashcards for you.
+                </p>
               </div>
 
-              <Tabs defaultValue="generate" className="space-y-6">
-                <TabsList>
-                  <TabsTrigger value="generate" data-testid="tab-generate">Generate New</TabsTrigger>
-                  <TabsTrigger value="library" data-testid="tab-library">My Flashcards</TabsTrigger>
+              <Tabs defaultValue="generate" className="space-y-8">
+                <TabsList className="bg-white/80 backdrop-blur-md shadow-lg border border-slate-200/60 rounded-2xl p-2">
+                  <TabsTrigger 
+                    value="generate" 
+                    className="rounded-xl px-6 py-3 font-semibold data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white data-[state=active]:shadow-lg"
+                    data-testid="tab-generate"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Generate New
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="library" 
+                    className="rounded-xl px-6 py-3 font-semibold data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white data-[state=active]:shadow-lg"
+                    data-testid="tab-library"
+                  >
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    My Flashcards
+                  </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="generate" className="space-y-6">
+                <TabsContent value="generate" className="space-y-8">
                   {/* File Upload Section */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Upload Study Material</CardTitle>
+                  <Card className="bg-white/90 backdrop-blur-md border border-slate-200/60 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl">
+                    <CardHeader className="pb-6">
+                      <CardTitle className="text-2xl modern-heading flex items-center">
+                        <Upload className="mr-3 h-6 w-6 text-purple-600" />
+                        Upload Study Material
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <FileUpload
@@ -224,44 +256,65 @@ export default function Flashcards() {
                         data-testid="file-upload-flashcards"
                       />
                       
-                      <div className="mt-6">
-                        <Label htmlFor="text-content">Or paste your content here:</Label>
+                      <div className="mt-8">
+                        <Label htmlFor="text-content" className="text-lg font-semibold modern-heading mb-4 block">
+                          Or paste your content here:
+                        </Label>
                         <Textarea
                           id="text-content"
-                          placeholder="Paste your study content here..."
+                          placeholder="Paste your study content here... (minimum 50 characters)"
                           value={textContent}
-                          onChange={(e) => setTextContent(e.target.value)}
-                          className="mt-2 min-h-[120px]"
+                          onChange={(e) => {
+                            setTextContent(e.target.value);
+                            if (error) setError("");
+                          }}
+                          className="form-input min-h-[140px] resize-none"
                           data-testid="textarea-content"
                         />
+                        {error && (
+                          <ErrorMessage 
+                            message={error} 
+                            dismissible 
+                            onDismiss={() => setError("")}
+                            className="mt-0"
+                          />
+                        )}
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Generation Options */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Generation Settings</CardTitle>
+                  <Card className="bg-white/90 backdrop-blur-md border border-slate-200/60 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl">
+                    <CardHeader className="pb-6">
+                      <CardTitle className="text-2xl modern-heading flex items-center">
+                        <Sparkles className="mr-3 h-6 w-6 text-purple-600" />
+                        Generation Settings
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                          <Label htmlFor="title">Flashcard Set Title</Label>
+                          <Label htmlFor="title" className="text-sm font-semibold modern-heading mb-2 block">
+                            Flashcard Set Title
+                          </Label>
                           <Input
                             id="title"
-                            placeholder="Enter title..."
+                            placeholder="Enter a descriptive title..."
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
+                            className="form-input"
                             data-testid="input-title"
                           />
                         </div>
                         <div>
-                          <Label htmlFor="card-count">Number of Cards</Label>
+                          <Label htmlFor="card-count" className="text-sm font-semibold modern-heading mb-2 block">
+                            Number of Cards
+                          </Label>
                           <Select value={cardCount} onValueChange={setCardCount}>
-                            <SelectTrigger data-testid="select-card-count">
+                            <SelectTrigger className="form-input" data-testid="select-card-count">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-white shadow-2xl border border-slate-200 rounded-xl">
                               <SelectItem value="5">5 cards</SelectItem>
                               <SelectItem value="10">10 cards</SelectItem>
                               <SelectItem value="20">20 cards</SelectItem>
@@ -270,12 +323,14 @@ export default function Flashcards() {
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="card-type">Card Type</Label>
+                          <Label htmlFor="card-type" className="text-sm font-semibold modern-heading mb-2 block">
+                            Card Type
+                          </Label>
                           <Select value={cardType} onValueChange={setCardType}>
-                            <SelectTrigger data-testid="select-card-type">
+                            <SelectTrigger className="form-input" data-testid="select-card-type">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-white shadow-2xl border border-slate-200 rounded-xl">
                               <SelectItem value="Question & Answer">Question & Answer</SelectItem>
                               <SelectItem value="Term & Definition">Term & Definition</SelectItem>
                               <SelectItem value="Concept & Explanation">Concept & Explanation</SelectItem>
@@ -283,12 +338,14 @@ export default function Flashcards() {
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="difficulty">Difficulty Level</Label>
+                          <Label htmlFor="difficulty" className="text-sm font-semibold modern-heading mb-2 block">
+                            Difficulty Level
+                          </Label>
                           <Select value={difficulty} onValueChange={setDifficulty}>
-                            <SelectTrigger data-testid="select-difficulty">
+                            <SelectTrigger className="form-input" data-testid="select-difficulty">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-white shadow-2xl border border-slate-200 rounded-xl">
                               <SelectItem value="Beginner">Beginner</SelectItem>
                               <SelectItem value="Intermediate">Intermediate</SelectItem>
                               <SelectItem value="Advanced">Advanced</SelectItem>
@@ -296,29 +353,42 @@ export default function Flashcards() {
                           </Select>
                         </div>
                       </div>
-                      <Button 
-                        onClick={handleGenerate}
-                        disabled={isGenerating || !textContent.trim()}
-                        className="mt-6 bg-primary text-white hover:bg-blue-700"
-                        data-testid="button-generate"
-                      >
-                        <Wand2 className="mr-2 h-4 w-4" />
-                        {isGenerating ? "Generating..." : "Generate Flashcards"}
-                      </Button>
+                      <div className="flex justify-center mt-8">
+                        <Button 
+                          onClick={handleGenerate}
+                          disabled={isGenerating || !textContent.trim()}
+                          className="btn-primary px-8 py-4 text-lg"
+                          data-testid="button-generate"
+                        >
+                          <Wand2 className="mr-3 h-5 w-5" />
+                          {isGenerating ? (
+                            <>
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                              Generating Flashcards...
+                            </>
+                          ) : (
+                            "Generate Flashcards"
+                          )}
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
 
                   {/* Generated Flashcards Preview */}
                   {generatedFlashcards.length > 0 && (
-                    <Card>
-                      <CardHeader>
+                    <Card className="bg-white/90 backdrop-blur-md border border-slate-200/60 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl">
+                      <CardHeader className="pb-6">
                         <div className="flex justify-between items-center">
-                          <CardTitle>Generated Flashcards</CardTitle>
-                          <div className="flex space-x-2">
+                          <CardTitle className="text-2xl modern-heading flex items-center">
+                            <Eye className="mr-3 h-6 w-6 text-green-600" />
+                            Generated Flashcards ({generatedFlashcards.length})
+                          </CardTitle>
+                          <div className="flex space-x-3">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={exportToPDF}
+                              className="border-slate-300 hover:bg-slate-50 rounded-xl"
                               data-testid="button-export-pdf"
                             >
                               <Download className="mr-1 h-4 w-4" />
@@ -349,47 +419,89 @@ export default function Flashcards() {
                   )}
                 </TabsContent>
 
-                <TabsContent value="library">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>My Flashcard Sets</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {setsLoading ? (
-                        <div className="text-center py-8">
-                          <p className="text-slate-600">Loading flashcard sets...</p>
-                        </div>
-                      ) : flashcardSets.length === 0 ? (
-                        <div className="text-center py-8">
-                          <p className="text-slate-600">No flashcard sets yet. Generate your first set!</p>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {flashcardSets.map((set: FlashcardSet) => (
-                            <Card key={set.id} className="border border-slate-200 hover:shadow-md transition-shadow">
-                              <CardContent className="p-4">
-                                <h3 className="font-semibold text-slate-900 mb-2">{set.title}</h3>
-                                <p className="text-sm text-slate-600 mb-3">{set.description}</p>
-                                <p className="text-xs text-slate-500 mb-3">
-                                  Created {new Date(set.createdAt).toLocaleDateString()}
-                                </p>
-                                <div className="flex space-x-2">
-                                  <Button variant="outline" size="sm" data-testid={`button-view-set-${set.id}`}>
-                                    <Eye className="mr-1 h-3 w-3" />
-                                    View
-                                  </Button>
-                                  <Button variant="outline" size="sm" data-testid={`button-edit-set-${set.id}`}>
-                                    <Edit className="mr-1 h-3 w-3" />
-                                    Edit
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                <TabsContent value="library" className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {flashcardSets.map((set) => (
+                      <Card 
+                        key={set.id} 
+                        className="flashcard-container p-6 group"
+                        data-testid={`flashcard-set-${set.id}`}
+                      >
+                        <CardContent className="p-0">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                              <BookOpen className="h-6 w-6 text-white" />
+                            </div>
+                            <div className="text-xs text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                              {new Date(set.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                          
+                          <h3 className="font-bold text-xl mb-3 modern-heading text-slate-900" data-testid={`set-title-${set.id}`}>
+                            {set.title}
+                          </h3>
+                          
+                          <p className="text-slate-600 text-sm mb-6 modern-body line-clamp-2">
+                            {set.description || "AI-generated flashcards ready for study"}
+                          </p>
+                          
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="btn-secondary flex-1"
+                              data-testid={`button-view-${set.id}`}
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              Study
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-slate-300 hover:bg-slate-50 rounded-xl px-3"
+                              data-testid={`button-edit-${set.id}`}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  
+                  {setsLoading && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {[...Array(3)].map((_, i) => (
+                        <Card key={i} className="flashcard-container p-6">
+                          <CardContent className="p-0">
+                            <div className="loading-shimmer w-full h-40 rounded-xl"></div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {flashcardSets.length === 0 && !setsLoading && (
+                    <div className="text-center py-16">
+                      <div className="w-24 h-24 bg-gradient-to-r from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        <BookOpen className="h-12 w-12 text-purple-500" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-4 modern-heading">No flashcard sets yet</h3>
+                      <p className="text-lg text-slate-600 mb-8 modern-body max-w-md mx-auto">
+                        Create your first set of AI-generated flashcards to get started on your learning journey.
+                      </p>
+                      <Button 
+                        onClick={() => {
+                          const generateTab = document.querySelector('[data-testid="tab-generate"]') as HTMLButtonElement;
+                          generateTab?.click();
+                        }}
+                        className="btn-primary"
+                      >
+                        <Plus className="mr-2 h-5 w-5" />
+                        Create Your First Set
+                      </Button>
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             </div>

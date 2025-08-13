@@ -200,11 +200,94 @@
   
   /* Modern profile dropdown */
   .profile-dropdown {
-    @apply bg-white/95 backdrop-blur-md shadow-2xl border-0 rounded-2xl p-2;
+    @apply bg-white shadow-2xl border border-slate-200/30 rounded-2xl p-2;
+    backdrop-filter: none;
+    z-index: 9999;
   }
   
   .profile-dropdown-item {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-slate-50/80;
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-slate-100;
+  }
+  
+  /* Error message styles */
+  .error-message {
+    @apply text-red-600 text-sm font-medium flex items-center gap-2 mt-2 p-2 bg-red-50 border border-red-200 rounded-lg;
+    animation: fadeInDown 0.3s ease-in-out;
+  }
+  
+  .error-message.fade-out {
+    animation: fadeOutUp 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeInDown {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes fadeOutUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+  }
+  
+  /* Flashcard enhancements */
+  .flashcard-container {
+    @apply bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200/60;
+  }
+  
+  .flashcard-container:hover {
+    @apply -translate-y-1 scale-[1.02];
+  }
+  
+  /* Form input enhancements */
+  .form-input {
+    @apply w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 modern-body;
+  }
+  
+  .form-input:focus {
+    @apply outline-none shadow-lg;
+  }
+  
+  /* Button enhancements */
+  .btn-primary {
+    @apply bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg active:scale-95;
+  }
+  
+  .btn-accent {
+    @apply bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg active:scale-95;
+  }
+  
+  /* Modern DOM nesting fix */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Accessibility improvements */
+  .focus-visible {
+    @apply outline-none ring-2 ring-purple-500 ring-offset-2;
+  }
+  
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-slate-100 rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-purple-300 rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-purple-400;
   }
   
   /* Typography improvements */

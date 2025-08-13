@@ -54,13 +54,13 @@ export default function Header() {
                   className="flex items-center space-x-3 text-slate-700 hover:text-slate-900 hover:bg-slate-50/80 rounded-xl transition-all duration-200 px-3 py-2 glow-on-hover"
                   data-testid="button-user-menu"
                 >
-                  <Avatar className="w-8 h-8 ring-2 ring-purple-200 ring-offset-2">
+                  <Avatar className="w-10 h-10 ring-2 ring-purple-200 ring-offset-2 shadow-lg">
                     <AvatarImage 
                       src={user?.profileImageUrl || ""} 
                       alt="User profile"
-                      className="object-cover"
+                      className="object-cover rounded-full"
                     />
-                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold">
+                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold text-lg">
                       {user?.firstName?.charAt(0) || user?.email?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -73,7 +73,7 @@ export default function Header() {
                   <ChevronDown className="h-4 w-4 transition-transform duration-200" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="profile-dropdown w-56">
+              <DropdownMenuContent align="end" className="profile-dropdown w-64" sideOffset={8}>
                 <DropdownMenuItem 
                   className="profile-dropdown-item cursor-pointer"
                   onClick={handleProfileClick}
