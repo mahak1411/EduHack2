@@ -1,0 +1,64 @@
+Task: Revamp the flashcard generation, remove edit features, upgrade the "view" experience, and re-style your app UI to be visually distinctive and modern.
+
+1. Flashcards Generator Enhancement
+
+Generate a variety of flashcard styles from input content:
+
+Term → Definition
+
+Question → Answer
+
+True/False
+
+Fill-in-the-blank (as one variant, not dominant)
+
+Make flashcards visually engaging: use colored backgrounds, bold typography, and relevant icons or images where possible.
+
+Do not generate only fill-in-the-blank cards.
+
+2. Flashcards Viewing Experience
+
+Remove the "Edit" option entirely.
+
+Make the "View" option interactive and fully functional:
+
+When a user selects "View," display the flashcards in an attractive card-based UI.
+
+Cards should be flippable (showing front and back), swipeable, or allow easy navigation between cards.
+
+If possible, use subtle animations for flipping and transitions.
+
+3. Study Library Functionality
+
+Ensure the "Delete" option for each saved study material works instantly and updates the library view.
+
+4. UI Design & Color Scheme
+
+Redesign the app using a bold, unconventional color palette for instant visual impact.
+
+Recommended palettes for 2025 include vibrant purples, saturated blues, coral, mint greens, and high-contrast combinations (e.g., neon over dark backgrounds or pastel with vivid accents).
+
+Do not use previous color themes. Make the color scheme distinctly new and modern.
+
+Apply minimal, clean layouts—no clutter; use clear buttons and interactive elements.
+
+Add playful UI accents: emojis, animated illustrations, and dynamic transitions for flashcards or navigation.
+
+5. Profile Section
+
+Remove "Edit" from the profile section.
+
+Ensure the "View" option displays all profile details dynamically and visually appealing, with profile photo and info formatted attractively.
+
+6. Other Requirements
+
+Notification features should remain removed.
+
+All changes must deliver a uniquely modern, intuitive, and energetic user experience in line with 2025’s leading UI trends.
+
+Reference for Inspiration:
+
+Interactive, animated card layouts (see Dribbble or Behance for trending flashcard UIs).
+
+For color ideas, explore Figma’s, Coolors’, or Color Hunt’s trending palettes for 2025.
+

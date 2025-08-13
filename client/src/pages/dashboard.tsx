@@ -13,7 +13,11 @@ import {
   HelpCircle, 
   StickyNote, 
   Trophy,
-  Sparkles 
+  Sparkles,
+  Brain,
+  Zap,
+  Target,
+  TrendingUp
 } from "lucide-react";
 import ComprehensiveGenerator from "@/components/comprehensive-generator";
 
@@ -76,81 +80,88 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       <Header />
       <div className="flex h-screen pt-16">
         <Sidebar />
         <main className="flex-1 overflow-y-auto">
-          <div className="p-6">
-            {/* Welcome Section */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                Welcome back, {user?.firstName || user?.email?.split('@')[0] || "User"}!
-              </h2>
-              <p className="text-slate-600">Continue your learning journey with AI-powered study tools.</p>
+          <div className="p-8">
+            {/* Modern Welcome Section */}
+            <div className="text-center mb-12">
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center float-animation pulse-glow">
+                  <Brain className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <h1 className="text-6xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-4">
+                Welcome back, {user?.firstName || user?.email?.split('@')[0] || "Amazing Learner"}! ✨
+              </h1>
+              <p className="text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                Continue your AI-powered learning journey. Create, study, and master knowledge like never before! 🚀
+              </p>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <Card className="border border-slate-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <BookOpen className="text-primary h-6 w-6" />
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-slate-600">Flashcard Sets</p>
-                      <p className="text-2xl font-bold text-slate-900" data-testid="stat-flashcard-sets">
+            {/* Modern Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 hover:scale-105 transition-transform duration-300 shadow-xl">
+                <CardContent className="p-8">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-purple-100 text-sm font-medium mb-2">💳 Flashcard Sets</p>
+                      <p className="text-4xl font-bold" data-testid="stat-flashcard-sets">
                         {statsLoading ? "..." : stats?.flashcardSets || 0}
                       </p>
                     </div>
+                    <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center">
+                      <BookOpen className="h-8 w-8 text-white" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="border border-slate-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
-                      <HelpCircle className="text-secondary h-6 w-6" />
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-slate-600">Quizzes Taken</p>
-                      <p className="text-2xl font-bold text-slate-900" data-testid="stat-quizzes-taken">
+              <Card className="bg-gradient-to-br from-emerald-500 to-green-600 text-white border-0 hover:scale-105 transition-transform duration-300 shadow-xl">
+                <CardContent className="p-8">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-emerald-100 text-sm font-medium mb-2">🧠 Quizzes Taken</p>
+                      <p className="text-4xl font-bold" data-testid="stat-quizzes-taken">
                         {statsLoading ? "..." : stats?.quizzesTaken || 0}
                       </p>
                     </div>
+                    <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center">
+                      <HelpCircle className="h-8 w-8 text-white" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="border border-slate-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                      <StickyNote className="text-accent h-6 w-6" />
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-slate-600">Study Notes</p>
-                      <p className="text-2xl font-bold text-slate-900" data-testid="stat-study-notes">
+              <Card className="bg-gradient-to-br from-blue-500 to-cyan-600 text-white border-0 hover:scale-105 transition-transform duration-300 shadow-xl">
+                <CardContent className="p-8">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-blue-100 text-sm font-medium mb-2">📝 Study Notes</p>
+                      <p className="text-4xl font-bold" data-testid="stat-study-notes">
                         {statsLoading ? "..." : stats?.studyNotes || 0}
                       </p>
                     </div>
+                    <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center">
+                      <StickyNote className="h-8 w-8 text-white" />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="border border-slate-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                      <Trophy className="text-orange-600 h-6 w-6" />
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-slate-600">Avg Quiz Score</p>
-                      <p className="text-2xl font-bold text-slate-900" data-testid="stat-avg-score">
+              <Card className="bg-gradient-to-br from-orange-500 to-pink-600 text-white border-0 hover:scale-105 transition-transform duration-300 shadow-xl">
+                <CardContent className="p-8">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-orange-100 text-sm font-medium mb-2">🏆 Avg Quiz Score</p>
+                      <p className="text-4xl font-bold" data-testid="stat-avg-score">
                         {statsLoading ? "..." : `${Math.round(stats?.avgQuizScore || 0)}%`}
                       </p>
+                    </div>
+                    <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center">
+                      <Trophy className="h-8 w-8 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -162,16 +173,16 @@ export default function Dashboard() {
               <ComprehensiveGenerator />
             </div>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="border border-slate-200 hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <BookOpen className="text-primary h-8 w-8" />
+            {/* Modern Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              <Card className="bg-white/80 backdrop-blur-sm border-2 border-purple-200 hover:shadow-2xl hover:scale-105 transition-all duration-300 group">
+                <CardContent className="p-8 text-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-6 transition-transform">
+                    <BookOpen className="text-white h-10 w-10" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">AI Flashcard Generator</h3>
-                  <p className="text-slate-600 text-sm mb-4">
-                    Upload your study materials and generate flashcards instantly with AI.
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">🎯 AI Flashcard Generator</h3>
+                  <p className="text-slate-600 text-base mb-6 leading-relaxed">
+                    Upload your study materials and generate interactive flashcards instantly with advanced AI.
                   </p>
                   <Button 
                     onClick={() => navigate("/flashcards")}

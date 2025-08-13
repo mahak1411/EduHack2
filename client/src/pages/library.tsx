@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -16,172 +16,161 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { 
-  Search, 
-  BookOpen, 
-  HelpCircle, 
-  StickyNote,
-  Clock,
-  Star,
-  Filter,
-  Eye,
-  Edit,
-  Trash2,
-  Calendar,
-  MoreVertical,
-  AlertTriangle
-} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { 
+  Search, 
+  BookOpen, 
+  HelpCircle, 
+  StickyNote, 
+  Calendar, 
+  Eye, 
+  Trash2, 
+  MoreVertical, 
+  AlertTriangle,
+  Library,
+  Sparkles
+} from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import ModernFlashcardViewer from "@/components/modern-flashcard-viewer";
 import { cn } from "@/lib/utils";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { useToast } from "@/hooks/use-toast";
-import type { FlashcardSet, Quiz, Note } from "@shared/schema";
 
-export default function Library() {
+export default function LibraryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [viewingItem, setViewingItem] = useState<any>(null);
+  const [viewingFlashcards, setViewingFlashcards] = useState<any[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch data with proper error handling
+  const { data: flashcardSets = [] } = useQuery({
+    queryKey: ['/api/flashcards/sets'],
+  });
+
+  const { data: quizzes = [] } = useQuery({
+    queryKey: ['/api/quizzes'],
+  });
+
+  const { data: notes = [] } = useQuery({
+    queryKey: ['/api/notes'],
+  });
+
   // Delete mutations
-  const deleteNoteMutation = useMutation({
-    mutationFn: async (noteId: string) => {
-      return apiRequest(`/api/notes/${noteId}`, { method: 'DELETE' });
-    },
+  const deleteFlashcardSetMutation = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/flashcards/sets/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/recent-activity'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/flashcards/sets'] });
       toast({
-        title: "Note Deleted",
-        description: "The note has been permanently removed from your library.",
+        title: "Success",
+        description: "Flashcard set deleted successfully",
       });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
-        title: "Delete Failed",
-        description: error.message || "Failed to delete note",
+        title: "Error",
+        description: "Failed to delete flashcard set",
         variant: "destructive",
       });
     }
   });
 
   const deleteQuizMutation = useMutation({
-    mutationFn: async (quizId: string) => {
-      return apiRequest(`/api/quizzes/${quizId}`, { method: 'DELETE' });
-    },
+    mutationFn: (id: string) => apiRequest(`/api/quizzes/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/quizzes'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/recent-activity'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user/stats'] });
       toast({
-        title: "Quiz Deleted",
-        description: "The quiz has been permanently removed from your library.",
+        title: "Success",
+        description: "Quiz deleted successfully",
       });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
-        title: "Delete Failed",
-        description: error.message || "Failed to delete quiz",
+        title: "Error",
+        description: "Failed to delete quiz",
         variant: "destructive",
       });
     }
   });
 
-  const deleteFlashcardSetMutation = useMutation({
-    mutationFn: async (setId: string) => {
-      return apiRequest(`/api/flashcards/sets/${setId}`, { method: 'DELETE' });
-    },
+  const deleteNoteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/notes/${id}`, { method: 'DELETE' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/flashcards/sets'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/recent-activity'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
       toast({
-        title: "Flashcard Set Deleted",
-        description: "The flashcard set has been permanently removed from your library.",
+        title: "Success",
+        description: "Note deleted successfully",
       });
     },
-    onError: (error: any) => {
+    onError: () => {
       toast({
-        title: "Delete Failed",
-        description: error.message || "Failed to delete flashcard set",
+        title: "Error",
+        description: "Failed to delete note",
         variant: "destructive",
       });
     }
   });
 
-  // Fetch all study materials
-  const { data: flashcardSets, isLoading: loadingFlashcards } = useQuery({
-    queryKey: ['/api/flashcards/sets'],
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        window.location.href = "/api/login";
-        return;
-      }
-    }
-  });
-
-  const { data: quizzes, isLoading: loadingQuizzes } = useQuery({
-    queryKey: ['/api/quizzes'],
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        window.location.href = "/api/login";
-        return;
-      }
-    }
-  });
-
-  const { data: notes, isLoading: loadingNotes } = useQuery({
-    queryKey: ['/api/notes'],
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        window.location.href = "/api/login";
-        return;
-      }
-    }
-  });
-
-  const isLoading = loadingFlashcards || loadingQuizzes || loadingNotes;
-
-  // Combine and filter all study materials
+  // Transform data for library items
   const allItems = [
-    ...(flashcardSets || []).map((set: FlashcardSet) => ({
+    ...(flashcardSets?.map((set: any) => ({
       ...set,
       type: 'flashcard',
       icon: BookOpen,
-      color: 'bg-blue-500'
-    })),
-    ...(quizzes || []).map((quiz: Quiz) => ({
+      color: 'bg-gradient-to-br from-purple-500 to-indigo-600',
+      description: `${set.flashcards?.length || 0} cards`
+    })) || []),
+    ...(quizzes?.map((quiz: any) => ({
       ...quiz,
       type: 'quiz',
       icon: HelpCircle,
-      color: 'bg-green-500'
-    })),
-    ...(notes || []).map((note: Note) => ({
+      color: 'bg-gradient-to-br from-emerald-500 to-green-600',
+      description: `${quiz.questions?.length || 0} questions`
+    })) || []),
+    ...(notes?.map((note: any) => ({
       ...note,
       type: 'note',
       icon: StickyNote,
-      color: 'bg-yellow-500'
-    }))
+      color: 'bg-gradient-to-br from-orange-500 to-pink-600',
+      description: note.summary || 'Study notes'
+    })) || [])
   ];
 
-  const filteredItems = allItems.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Filter items based on search and active tab
+  const filteredItems = allItems.filter((item) => {
+    const matchesSearch = item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTab = activeTab === 'all' || item.type === activeTab;
     return matchesSearch && matchesTab;
   });
 
-  const handleItemClick = (item: any) => {
-    // Navigate to the appropriate page based on item type
+  const handleViewItem = async (item: any) => {
     if (item.type === 'flashcard') {
-      window.location.href = '/flashcards';
+      try {
+        const response = await fetch(`/api/flashcards/sets/${item.id}/cards`);
+        if (response.ok) {
+          const flashcards = await response.json();
+          setViewingFlashcards(flashcards);
+          setViewingItem(item);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to load flashcards",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error", 
+          description: "Failed to load flashcards",
+          variant: "destructive",
+        });
+      }
     } else if (item.type === 'quiz') {
       window.location.href = '/quizzes';
     } else if (item.type === 'note') {
@@ -189,307 +178,291 @@ export default function Library() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-slate-900">Study Library</h1>
-        </div>
-        
-        {/* Loading skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="pb-3">
-                <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                <div className="h-3 bg-slate-200 rounded w-1/2 mt-2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-3 bg-slate-200 rounded w-full"></div>
-                <div className="h-3 bg-slate-200 rounded w-2/3 mt-2"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Study Library</h1>
-          <p className="text-slate-600 mt-1">
-            All your flashcards, quizzes, and notes in one place
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-            <Input
-              placeholder="Search your study materials..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-80"
-            />
+    <>
+      {/* Modern Flashcard Viewer */}
+      {viewingItem && viewingItem.type === 'flashcard' && (
+        <ModernFlashcardViewer 
+          flashcards={viewingFlashcards}
+          title={viewingItem.title}
+          onClose={() => {
+            setViewingItem(null);
+            setViewingFlashcards([]);
+          }}
+        />
+      )}
+
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-6">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Modern Header */}
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center float-animation">
+                <Library className="h-6 w-6 text-white" />
+              </div>
+            </div>
+            <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+              🚀 Study Library
+            </h1>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Your collection of AI-powered study materials, beautifully organized and ready to explore
+            </p>
           </div>
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
-          </Button>
-        </div>
-      </div>
+          
+          {/* Modern Search */}
+          <div className="flex justify-center">
+            <div className="relative max-w-md w-full">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400 h-5 w-5" />
+              <Input
+                placeholder="🔍 Search your study materials..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 pr-4 py-3 text-lg rounded-2xl border-2 border-purple-200 focus:border-purple-500 bg-white/80 backdrop-blur-sm"
+              />
+            </div>
+          </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Total Items</p>
-                <p className="text-2xl font-bold text-slate-900">{allItems.length}</p>
-              </div>
-              <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="h-4 w-4 text-slate-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Flashcard Sets</p>
-                <p className="text-2xl font-bold text-blue-600">{flashcardSets?.length || 0}</p>
-              </div>
-              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="h-4 w-4 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Quizzes</p>
-                <p className="text-2xl font-bold text-green-600">{quizzes?.length || 0}</p>
-              </div>
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                <HelpCircle className="h-4 w-4 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Notes</p>
-                <p className="text-2xl font-bold text-yellow-600">{notes?.length || 0}</p>
-              </div>
-              <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <StickyNote className="h-4 w-4 text-yellow-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full md:w-96 grid-cols-4">
-          <TabsTrigger value="all">All ({allItems.length})</TabsTrigger>
-          <TabsTrigger value="flashcard">Flashcards ({flashcardSets?.length || 0})</TabsTrigger>
-          <TabsTrigger value="quiz">Quizzes ({quizzes?.length || 0})</TabsTrigger>
-          <TabsTrigger value="note">Notes ({notes?.length || 0})</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab} className="mt-6">
-          {filteredItems.length === 0 ? (
-            <Card className="py-12">
-              <CardContent className="text-center">
-                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  {activeTab === 'all' && <BookOpen className="h-8 w-8 text-slate-400" />}
-                  {activeTab === 'flashcard' && <BookOpen className="h-8 w-8 text-slate-400" />}
-                  {activeTab === 'quiz' && <HelpCircle className="h-8 w-8 text-slate-400" />}
-                  {activeTab === 'note' && <StickyNote className="h-8 w-8 text-slate-400" />}
-                </div>
-                <h3 className="text-lg font-medium text-slate-900 mb-2">
-                  {searchTerm ? 'No matching items found' : `No ${activeTab === 'all' ? 'study materials' : activeTab + 's'} yet`}
-                </h3>
-                <p className="text-slate-600 mb-4">
-                  {searchTerm 
-                    ? 'Try adjusting your search terms or browse all items'
-                    : `Start by creating your first ${activeTab === 'all' ? 'study material' : activeTab}`
-                  }
-                </p>
-                {!searchTerm && (
-                  <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                    <Button onClick={() => window.location.href = '/flashcards'}>
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Create Flashcards
-                    </Button>
-                    <Button variant="outline" onClick={() => window.location.href = '/quizzes'}>
-                      <HelpCircle className="h-4 w-4 mr-2" />
-                      Create Quiz
-                    </Button>
-                    <Button variant="outline" onClick={() => window.location.href = '/notes'}>
-                      <StickyNote className="h-4 w-4 mr-2" />
-                      Create Notes
-                    </Button>
+          {/* Modern Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 hover:scale-105 transition-transform duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-100 text-sm font-medium">Total Items</p>
+                    <p className="text-3xl font-bold">{allItems.length}</p>
                   </div>
-                )}
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                    <Sparkles className="h-6 w-6 text-white" />
+                  </div>
+                </div>
               </CardContent>
             </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredItems.map((item, index) => {
-                const IconComponent = item.icon;
-                return (
-                  <Card 
-                    key={`${item.type}-${item.id}`} 
-                    className="hover:shadow-lg transition-all cursor-pointer group"
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", item.color)}>
-                            <IconComponent className="h-4 w-4 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-slate-900 group-hover:text-primary transition-colors">
-                              {item.title}
-                            </h3>
-                            <Badge variant="secondary" className="text-xs mt-1">
-                              {item.type === 'flashcard' ? 'Flashcard Set' : item.type}
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        {/* Actions Dropdown */}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleItemClick(item)}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              View
-                            </DropdownMenuItem>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                  <Trash2 className="h-4 w-4 mr-2 text-red-500" />
-                                  <span className="text-red-500">Delete</span>
-                                </DropdownMenuItem>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle className="flex items-center gap-2">
-                                    <AlertTriangle className="h-5 w-5 text-red-500" />
-                                    Delete {item.type}?
-                                  </AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete "<strong>{item.title}</strong>"? 
-                                    This action cannot be undone and will permanently remove this {item.type} 
-                                    from your library.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => {
-                                      if (item.type === 'note') {
-                                        deleteNoteMutation.mutate(item.id);
-                                      } else if (item.type === 'quiz') {
-                                        deleteQuizMutation.mutate(item.id);
-                                      } else if (item.type === 'flashcard') {
-                                        deleteFlashcardSetMutation.mutate(item.id);
-                                      }
-                                    }}
-                                    className="bg-red-500 hover:bg-red-600 focus:ring-red-500"
-                                  >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                      
-                      {item.description && (
-                        <p className="text-sm text-slate-600 mt-2 line-clamp-2">
-                          {item.description}
-                        </p>
-                      )}
-                    </CardHeader>
-                    
-                    <CardContent className="pt-0">
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {new Date(item.createdAt).toLocaleDateString()}
-                          </div>
-                          {item.updatedAt && item.updatedAt !== item.createdAt && (
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              Updated {new Date(item.updatedAt).toLocaleDateString()}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {item.tags && item.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-3">
-                          {item.tags.slice(0, 3).map((tag: string, tagIndex: number) => (
-                            <Badge key={tagIndex} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {item.tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{item.tags.length - 3}
-                            </Badge>
-                          )}
-                        </div>
-                      )}
-                      
-                      <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="sm" variant="outline" className="flex-1">
-                          <Eye className="h-3 w-3 mr-1" />
-                          View
-                        </Button>
-                        <Button size="sm" variant="outline" className="flex-1">
-                          <Edit className="h-3 w-3 mr-1" />
-                          Edit
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+            
+            <Card className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white border-0 hover:scale-105 transition-transform duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-100 text-sm font-medium">💳 Flashcard Sets</p>
+                    <p className="text-3xl font-bold">{flashcardSets?.length || 0}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                    <BookOpen className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-emerald-500 to-green-500 text-white border-0 hover:scale-105 transition-transform duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-emerald-100 text-sm font-medium">🧠 Quizzes</p>
+                    <p className="text-3xl font-bold">{quizzes?.length || 0}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                    <HelpCircle className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-orange-500 to-pink-500 text-white border-0 hover:scale-105 transition-transform duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-orange-100 text-sm font-medium">📝 Notes</p>
+                    <p className="text-3xl font-bold">{notes?.length || 0}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                    <StickyNote className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Modern Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <div className="flex justify-center">
+              <TabsList className="grid grid-cols-4 bg-white/60 backdrop-blur-sm rounded-2xl p-2 border-2 border-purple-200">
+                <TabsTrigger value="all" className="rounded-xl text-sm font-medium">
+                  ✨ All ({allItems.length})
+                </TabsTrigger>
+                <TabsTrigger value="flashcard" className="rounded-xl text-sm font-medium">
+                  💳 Cards ({flashcardSets?.length || 0})
+                </TabsTrigger>
+                <TabsTrigger value="quiz" className="rounded-xl text-sm font-medium">
+                  🧠 Quizzes ({quizzes?.length || 0})
+                </TabsTrigger>
+                <TabsTrigger value="note" className="rounded-xl text-sm font-medium">
+                  📝 Notes ({notes?.length || 0})
+                </TabsTrigger>
+              </TabsList>
             </div>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
+
+            <TabsContent value={activeTab} className="mt-8">
+              {filteredItems.length === 0 ? (
+                <Card className="py-16 bg-white/60 backdrop-blur-sm border-2 border-purple-200">
+                  <CardContent className="text-center">
+                    <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                      {activeTab === 'all' && <Sparkles className="h-10 w-10 text-white" />}
+                      {activeTab === 'flashcard' && <BookOpen className="h-10 w-10 text-white" />}
+                      {activeTab === 'quiz' && <HelpCircle className="h-10 w-10 text-white" />}
+                      {activeTab === 'note' && <StickyNote className="h-10 w-10 text-white" />}
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                      {searchTerm ? '🔍 No matching items found' : `✨ No ${activeTab === 'all' ? 'study materials' : activeTab + 's'} yet`}
+                    </h3>
+                    <p className="text-slate-600 mb-6 text-lg">
+                      {searchTerm 
+                        ? 'Try adjusting your search terms or browse all items'
+                        : `Start creating your first ${activeTab === 'all' ? 'study material' : activeTab} to see it here`
+                      }
+                    </p>
+                    {!searchTerm && (
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <Button onClick={() => window.location.href = '/flashcards'} className="btn-gradient">
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Create Flashcards
+                        </Button>
+                        <Button onClick={() => window.location.href = '/quizzes'} className="btn-gradient">
+                          <HelpCircle className="h-4 w-4 mr-2" />
+                          Create Quiz
+                        </Button>
+                        <Button onClick={() => window.location.href = '/notes'} className="btn-gradient">
+                          <StickyNote className="h-4 w-4 mr-2" />
+                          Create Notes
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredItems.map((item, index) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <Card 
+                        key={`${item.type}-${item.id}`} 
+                        className="group hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer bg-white/80 backdrop-blur-sm border-2 border-purple-100 hover:border-purple-300"
+                        onClick={() => handleViewItem(item)}
+                      >
+                        <CardHeader className="pb-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg", item.color)}>
+                                <IconComponent className="h-6 w-6 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-bold text-slate-900 group-hover:text-purple-600 transition-colors text-lg truncate">
+                                  {item.title}
+                                </h3>
+                                <Badge variant="secondary" className="mt-1 text-xs bg-purple-100 text-purple-700">
+                                  {item.type === 'flashcard' ? 'Flashcard Set' : item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                                </Badge>
+                              </div>
+                            </div>
+                            
+                            {/* Actions Dropdown */}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-10 w-10 p-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-full hover:bg-purple-100"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm">
+                                <DropdownMenuItem onClick={() => handleViewItem(item)} className="cursor-pointer">
+                                  <Eye className="h-4 w-4 mr-2 text-blue-600" />
+                                  <span className="text-blue-600 font-medium">View Study Material</span>
+                                </DropdownMenuItem>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                                      <Trash2 className="h-4 w-4 mr-2 text-red-500" />
+                                      <span className="text-red-500 font-medium">Delete</span>
+                                    </DropdownMenuItem>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent className="bg-white/95 backdrop-blur-sm">
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle className="flex items-center gap-2 text-xl">
+                                        <AlertTriangle className="h-6 w-6 text-red-500" />
+                                        Delete {item.type}?
+                                      </AlertDialogTitle>
+                                      <AlertDialogDescription className="text-base">
+                                        Are you sure you want to delete "<strong>{item.title}</strong>"? 
+                                        This action cannot be undone and will permanently remove this {item.type} 
+                                        from your library.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel className="bg-gray-100 hover:bg-gray-200">
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => {
+                                          if (item.type === 'note') {
+                                            deleteNoteMutation.mutate(item.id);
+                                          } else if (item.type === 'quiz') {
+                                            deleteQuizMutation.mutate(item.id);
+                                          } else if (item.type === 'flashcard') {
+                                            deleteFlashcardSetMutation.mutate(item.id);
+                                          }
+                                        }}
+                                        className="bg-red-500 hover:bg-red-600 focus:ring-red-500"
+                                      >
+                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        Delete Forever
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                          
+                          {item.description && (
+                            <p className="text-slate-600 mt-3 text-sm leading-relaxed">
+                              {item.description}
+                            </p>
+                          )}
+                        </CardHeader>
+                        
+                        <CardContent className="pt-0">
+                          <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>Created {new Date(item.createdAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button 
+                              size="sm" 
+                              className="btn-gradient w-full"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewItem(item);
+                              }}
+                            >
+                              <Eye className="h-4 w-4 mr-2" />
+                              Study Now
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </>
   );
 }
