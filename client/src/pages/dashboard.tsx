@@ -12,8 +12,10 @@ import {
   BookOpen, 
   HelpCircle, 
   StickyNote, 
-  Trophy 
+  Trophy,
+  Sparkles 
 } from "lucide-react";
+import ComprehensiveGenerator from "@/components/comprehensive-generator";
 
 export default function Dashboard() {
   const { toast } = useToast();
@@ -153,6 +155,11 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* AI Study Generator */}
+            <div className="mb-8">
+              <ComprehensiveGenerator />
             </div>
 
             {/* Quick Actions */}

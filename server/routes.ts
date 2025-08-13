@@ -258,6 +258,140 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Comprehensive study materials generation route
+  app.post('/api/generate-all-materials', isAuthenticated, upload.single('file'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      let content = req.body.content;
+      
+      // If file uploaded, extract text
+      if (req.file) {
+        try {
+          const extractedText = await fileService.extractText(req.file);
+          
+          // Check if extraction was successful (not a fallback message)
+          if (!extractedText.includes('failed') && !extractedText.includes('manually') && extractedText.length > 100) {
+            content = extractedText;
+          } else {
+            // File extraction failed, return the message for manual entry
+            await fileService.cleanupFile(req.file.path);
+            return res.status(400).json({ 
+              message: "Automatic text extraction failed",
+              extractionResult: extractedText,
+              requiresManualInput: true
+            });
+          }
+        } catch (error) {
+          await fileService.cleanupFile(req.file.path);
+          return res.status(400).json({ 
+            message: "File processing failed",
+            error: error instanceof Error ? error.message : "Unknown error",
+            requiresManualInput: true
+          });
+        }
+        
+        // Clean up uploaded file
+        await fileService.cleanupFile(req.file.path);
+      }
+
+      if (!content || content.trim().length < 100) {
+        return res.status(400).json({ 
+          message: "Insufficient content for study material generation. Please provide at least 100 characters of text content.",
+          requiresManualInput: true
+        });
+      }
+
+      console.log(`Generating comprehensive study materials for user ${userId} with ${content.length} characters`);
+
+      // Generate all three types of study materials in parallel
+      const [summary, quiz, flashcards] = await Promise.all([
+        aiService.generateNotes(content, { 
+          format: 'summary'
+        }),
+        aiService.generateQuizQuestions(content, {
+          questionCount: 8,
+          questionTypes: ['multiple-choice', 'true-false', 'short-answer']
+        }),
+        aiService.generateFlashcards(content, {
+          count: 10
+        })
+      ]);
+
+      // Save all materials to database
+      const [savedNote, savedQuiz, savedFlashcardSet] = await Promise.all([
+        // Save notes
+        storage.createNote(userId, insertNoteSchema.parse({
+          title: `📝 ${req.body.title || 'Study Summary'}`,
+          content: summary,
+          tags: ['auto-generated', 'summary']
+        })),
+        
+        // Save quiz
+        storage.createQuiz(userId, insertQuizSchema.parse({
+          title: `🧠 ${req.body.title || 'Study Quiz'}`,
+          description: "Auto-generated mixed-format quiz",
+          questions: quiz,
+          tags: ['auto-generated', 'mixed-format']
+        })),
+        
+        // Save flashcards
+        storage.createFlashcardSet(userId, insertFlashcardSetSchema.parse({
+          title: `💡 ${req.body.title || 'Study Flashcards'}`,
+          description: "Auto-generated flashcard set",
+          tags: ['auto-generated', 'comprehensive']
+        })).then(async (flashcardSet) => {
+          // Add individual flashcards
+          const flashcardPromises = flashcards.map((card: any) =>
+            storage.createFlashcard({
+              setId: flashcardSet.id,
+              front: card.front,
+              back: card.back
+            })
+          );
+          await Promise.all(flashcardPromises);
+          return flashcardSet;
+        })
+      ]);
+
+      res.json({
+        success: true,
+        message: "All study materials generated successfully!",
+        materials: {
+          summary: {
+            id: savedNote.id,
+            title: savedNote.title,
+            content: summary
+          },
+          quiz: {
+            id: savedQuiz.id,
+            title: savedQuiz.title,
+            questionCount: quiz.length,
+            questions: quiz
+          },
+          flashcards: {
+            id: savedFlashcardSet.id,
+            title: savedFlashcardSet.title,
+            cardCount: flashcards.length,
+            cards: flashcards
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error("Error generating comprehensive study materials:", error);
+      
+      // Clean up file if it exists
+      if (req.file) {
+        await fileService.cleanupFile(req.file.path);
+      }
+      
+      res.status(500).json({ 
+        message: "Failed to generate study materials",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Recent activity route
   app.get('/api/recent-activity', isAuthenticated, async (req: any, res) => {
     try {

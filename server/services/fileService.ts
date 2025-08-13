@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { promisify } from "util";
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const pdfParse = require('pdf-parse');
 const unlinkAsync = promisify(fs.unlink);
 
 export class FileService {
@@ -26,20 +29,43 @@ export class FileService {
       }
 
       if (mimeType === "application/pdf") {
-        // For now, return a safe placeholder message for PDFs
-        // This prevents database encoding errors while maintaining functionality
-        const safeMessage = `PDF file "${file.originalname}" uploaded successfully. 
-        
-The file contains ${Math.round(fileStats.size / 1024)}KB of content. To generate study materials from this PDF:
+        try {
+          // Extract text from PDF using pdf-parse
+          const dataBuffer = await fs.promises.readFile(filePath);
+          const data = await pdfParse(dataBuffer);
+          
+          if (!data.text || data.text.trim().length < 50) {
+            throw new Error('PDF appears to be scanned or contains minimal extractable text');
+          }
+          
+          console.log(`Successfully extracted ${data.text.length} characters from PDF`);
+          return this.sanitizeText(data.text);
+          
+        } catch (error) {
+          console.error('PDF text extraction failed:', error);
+          
+          // Return helpful message for manual text entry
+          const fallbackMessage = `PDF file "${file.originalname}" uploaded but text extraction failed.
+          
+This may occur if the PDF is:
+- Scanned/image-based (requires OCR)  
+- Password-protected
+- Contains minimal text content
 
-1. Open the PDF file
-2. Copy the text you want to study
+To proceed with study material generation:
+
+1. Open the PDF file manually
+2. Copy the text content you want to study
 3. Paste it into the text area above
-4. Click "Generate" to create your study materials
+4. Click "Generate All Study Materials" to create comprehensive study resources
 
-Note: Full PDF text extraction will be available in a future update.`;
-        
-        return this.sanitizeText(safeMessage);
+The system will automatically generate:
+- A concise study summary
+- A mixed-format quiz (multiple choice, true/false, short answer)
+- A set of study flashcards`;
+          
+          return this.sanitizeText(fallbackMessage);
+        }
       }
 
       if (mimeType.startsWith("image/")) {
