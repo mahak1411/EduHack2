@@ -5,7 +5,8 @@ import {
   BookOpen, 
   HelpCircle, 
   StickyNote, 
-  Library 
+  Library,
+  User
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -16,6 +17,7 @@ const navigation = [
   { name: "AI Quizzes", href: "/quizzes", icon: HelpCircle },
   { name: "AI Notes", href: "/notes", icon: StickyNote },
   { name: "Study Library", href: "/library", icon: Library },
+  { name: "Profile", href: "/profile", icon: User },
 ];
 
 function RecentActivity() {

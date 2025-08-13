@@ -34,7 +34,11 @@ export interface IStorage {
   getFlashcardSet(setId: string): Promise<FlashcardSet | undefined>;
   getFlashcardsForSet(setId: string): Promise<Flashcard[]>;
   createFlashcard(flashcardData: InsertFlashcard): Promise<Flashcard>;
-  deleteFlashcardSet(setId: string): Promise<void>;
+  deleteFlashcardSet(userId: string, setId: string): Promise<void>;
+  deleteNote(userId: string, noteId: string): Promise<void>;
+  deleteQuiz(userId: string, quizId: string): Promise<void>;
+  getUserProfile(userId: string): Promise<any>;
+  updateUserProfile(userId: string, updates: any): Promise<any>;
   
   // Quiz operations
   createQuiz(userId: string, quizData: InsertQuiz): Promise<Quiz>;
@@ -259,6 +263,35 @@ export class DatabaseStorage implements IStorage {
       studyNotes: Number(notesCount.count) || 0,
       avgQuizScore: Number(quizStats[0]?.avgScore) || 0,
     };
+  }
+
+  async deleteNote(userId: string, noteId: string): Promise<void> {
+    await db.delete(notes).where(and(eq(notes.id, noteId), eq(notes.userId, userId)));
+  }
+
+  async deleteQuiz(userId: string, quizId: string): Promise<void> {
+    await db.delete(quizzes).where(and(eq(quizzes.id, quizId), eq(quizzes.userId, userId)));
+  }
+
+  async deleteFlashcardSet(userId: string, setId: string): Promise<void> {
+    // First delete all flashcards in the set
+    await db.delete(flashcards).where(eq(flashcards.setId, setId));
+    // Then delete the set
+    await db.delete(flashcardSets).where(and(eq(flashcardSets.id, setId), eq(flashcardSets.userId, userId)));
+  }
+
+  async getUserProfile(userId: string): Promise<any> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    return user || null;
+  }
+
+  async updateUserProfile(userId: string, updates: any): Promise<any> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return updatedUser;
   }
 }
 

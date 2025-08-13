@@ -10,6 +10,7 @@ import Flashcards from "@/pages/flashcards";
 import Quizzes from "@/pages/quizzes";
 import Notes from "@/pages/notes";
 import Library from "@/pages/library";
+import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
           <Route path="/quizzes" component={Quizzes} />
           <Route path="/notes" component={Notes} />
           <Route path="/library" component={Library} />
+          <Route path="/profile" component={Profile} />
         </>
       )}
       <Route component={NotFound} />

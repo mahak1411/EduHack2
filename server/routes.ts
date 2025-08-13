@@ -392,6 +392,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete routes for study materials
+  app.delete('/api/notes/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const noteId = req.params.id;
+      
+      await storage.deleteNote(userId, noteId);
+      res.json({ success: true, message: "Note deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting note:", error);
+      res.status(500).json({ message: "Failed to delete note" });
+    }
+  });
+
+  app.delete('/api/quizzes/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const quizId = req.params.id;
+      
+      await storage.deleteQuiz(userId, quizId);
+      res.json({ success: true, message: "Quiz deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting quiz:", error);
+      res.status(500).json({ message: "Failed to delete quiz" });
+    }
+  });
+
+  app.delete('/api/flashcards/sets/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const setId = req.params.id;
+      
+      await storage.deleteFlashcardSet(userId, setId);
+      res.json({ success: true, message: "Flashcard set deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting flashcard set:", error);
+      res.status(500).json({ message: "Failed to delete flashcard set" });
+    }
+  });
+
+  // Profile routes
+  app.get('/api/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUserProfile(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      res.status(500).json({ message: "Failed to fetch profile" });
+    }
+  });
+
+  app.put('/api/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const updates = req.body;
+      
+      const updatedProfile = await storage.updateUserProfile(userId, updates);
+      res.json(updatedProfile);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
   // Recent activity route
   app.get('/api/recent-activity', isAuthenticated, async (req: any, res) => {
     try {

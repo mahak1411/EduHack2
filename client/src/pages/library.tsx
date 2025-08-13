@@ -1,10 +1,21 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { 
   Search, 
   BookOpen, 
@@ -16,8 +27,17 @@ import {
   Eye,
   Edit,
   Trash2,
-  Calendar
+  Calendar,
+  MoreVertical,
+  AlertTriangle
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { useToast } from "@/hooks/use-toast";
@@ -27,6 +47,74 @@ export default function Library() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Delete mutations
+  const deleteNoteMutation = useMutation({
+    mutationFn: async (noteId: string) => {
+      return apiRequest(`/api/notes/${noteId}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/notes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/recent-activity'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/stats'] });
+      toast({
+        title: "Note Deleted",
+        description: "The note has been permanently removed from your library.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete note",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deleteQuizMutation = useMutation({
+    mutationFn: async (quizId: string) => {
+      return apiRequest(`/api/quizzes/${quizId}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/quizzes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/recent-activity'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/stats'] });
+      toast({
+        title: "Quiz Deleted",
+        description: "The quiz has been permanently removed from your library.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete quiz",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deleteFlashcardSetMutation = useMutation({
+    mutationFn: async (setId: string) => {
+      return apiRequest(`/api/flashcards/sets/${setId}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/flashcards/sets'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/recent-activity'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/stats'] });
+      toast({
+        title: "Flashcard Set Deleted",
+        description: "The flashcard set has been permanently removed from your library.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete flashcard set",
+        variant: "destructive",
+      });
+    }
+  });
 
   // Fetch all study materials
   const { data: flashcardSets, isLoading: loadingFlashcards } = useQuery({
@@ -272,7 +360,7 @@ export default function Library() {
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", item.color)}>
                             <IconComponent className="h-4 w-4 text-white" />
                           </div>
@@ -285,6 +373,65 @@ export default function Library() {
                             </Badge>
                           </div>
                         </div>
+                        
+                        {/* Actions Dropdown */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleItemClick(item)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              View
+                            </DropdownMenuItem>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <Trash2 className="h-4 w-4 mr-2 text-red-500" />
+                                  <span className="text-red-500">Delete</span>
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="flex items-center gap-2">
+                                    <AlertTriangle className="h-5 w-5 text-red-500" />
+                                    Delete {item.type}?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "<strong>{item.title}</strong>"? 
+                                    This action cannot be undone and will permanently remove this {item.type} 
+                                    from your library.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => {
+                                      if (item.type === 'note') {
+                                        deleteNoteMutation.mutate(item.id);
+                                      } else if (item.type === 'quiz') {
+                                        deleteQuizMutation.mutate(item.id);
+                                      } else if (item.type === 'flashcard') {
+                                        deleteFlashcardSetMutation.mutate(item.id);
+                                      }
+                                    }}
+                                    className="bg-red-500 hover:bg-red-600 focus:ring-red-500"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                       
                       {item.description && (

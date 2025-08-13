@@ -95,7 +95,7 @@ export class AIService {
     return { questions };
   }
 
-  // Generate flashcards from content analysis
+  // Generate mixed-format flashcards from content analysis
   private generateFlashcardsFromContent(content: string, count: number): any[] {
     const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 20);
     const flashcards = [];
@@ -106,69 +106,139 @@ export class AIService {
       return words.length >= 5 && words.length <= 30 && !this.isInappropriateContent(sentence);
     });
     
-    for (let i = 0; i < Math.min(count, validSentences.length); i++) {
-      const sentence = validSentences[i].trim();
+    // Define flashcard types to cycle through
+    const cardTypes = ['term-definition', 'question-answer', 'true-false', 'fill-in-blank'];
+    
+    for (let i = 0; i < Math.min(count, validSentences.length * 2); i++) {
+      const sentence = validSentences[i % validSentences.length].trim();
+      const cardType = cardTypes[i % cardTypes.length];
+      let flashcard = null;
+      
       if (sentence.length > 20) {
-        // Create questions based on sentence structure
-        let question = "";
-        let answer = sentence;
-        
-        // Look for definitions (is/are patterns)
-        if (sentence.includes(" is ") || sentence.includes(" are ")) {
-          const parts = sentence.split(/ (is|are) /);
-          if (parts.length >= 2 && parts[0].trim() && parts[1].trim()) {
-            question = `What ${parts[1].trim()}?`;
-            answer = parts[0].trim();
-          }
-        } else if (sentence.includes(" means ") || sentence.includes(" refers to ")) {
-          // Handle definition patterns
-          const splitWord = sentence.includes(" means ") ? " means " : " refers to ";
-          const parts = sentence.split(splitWord);
-          if (parts.length >= 2) {
-            question = `What ${splitWord.trim()} ${parts[1].trim()}?`;
-            answer = parts[0].trim();
-          }
-        } else {
-          // Create fill-in-the-blank style questions with better word selection
-          const words = sentence.split(' ');
-          const meaningfulWords = words.filter(word => 
-            word.length > 3 && 
-            !['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were'].includes(word.toLowerCase())
-          );
-          
-          if (meaningfulWords.length > 0) {
-            const importantWord = meaningfulWords[Math.floor(Math.random() * meaningfulWords.length)];
-            question = sentence.replace(importantWord, '______');
-            answer = importantWord;
-          }
+        switch (cardType) {
+          case 'term-definition':
+            flashcard = this.createTermDefinitionCard(sentence);
+            break;
+          case 'question-answer':
+            flashcard = this.createQuestionAnswerCard(sentence);
+            break;
+          case 'true-false':
+            flashcard = this.createTrueFalseCard(sentence);
+            break;
+          case 'fill-in-blank':
+            flashcard = this.createFillInBlankCard(sentence);
+            break;
         }
         
-        if (!question || question === sentence) {
-          // Create a more engaging question format
-          question = `Based on your study material: ${sentence.substring(0, 60)}...`;
-          answer = "Review the key concepts and main points from this section.";
-        }
-        
-        // Ensure questions and answers are appropriate and useful
-        if (question.length > 10 && answer.length > 2) {
-          flashcards.push({
-            front: question,
-            back: answer
-          });
+        if (flashcard && flashcard.front.length > 5 && flashcard.back.length > 2) {
+          flashcards.push(flashcard);
         }
       }
     }
     
-    // Fill remaining slots with content-based cards if needed
-    while (flashcards.length < count && flashcards.length < Math.min(10, validSentences.length)) {
-      const remainingSentence = validSentences[flashcards.length % validSentences.length];
-      flashcards.push({
-        front: `Key concept from your study material: What does this relate to?`,
-        back: `${remainingSentence.substring(0, 100)}...`
-      });
+    return flashcards.slice(0, count);
+  }
+
+  private createTermDefinitionCard(sentence: string): any {
+    // Look for definition patterns
+    if (sentence.includes(" is ") || sentence.includes(" are ")) {
+      const parts = sentence.split(/ (is|are) /);
+      if (parts.length >= 2 && parts[0].trim() && parts[1].trim()) {
+        return {
+          front: parts[0].trim(),
+          back: parts[1].trim(),
+          type: 'term-definition'
+        };
+      }
     }
     
-    return flashcards.slice(0, count);
+    // Extract key terms (usually first few words)
+    const words = sentence.split(' ');
+    if (words.length >= 5) {
+      const term = words.slice(0, 2).join(' ');
+      const definition = words.slice(2).join(' ');
+      return {
+        front: term,
+        back: definition,
+        type: 'term-definition'
+      };
+    }
+    
+    return null;
+  }
+
+  private createQuestionAnswerCard(sentence: string): any {
+    // Create question based on sentence structure
+    let question = "";
+    let answer = sentence;
+    
+    if (sentence.includes(" because ")) {
+      const parts = sentence.split(" because ");
+      question = `Why ${parts[0].trim()}?`;
+      answer = `Because ${parts[1].trim()}`;
+    } else if (sentence.includes(" when ")) {
+      const parts = sentence.split(" when ");
+      question = `When does ${parts[0].trim()}?`;
+      answer = parts[1].trim();
+    } else {
+      // Create a general question
+      question = `What can you tell me about: ${sentence.substring(0, 40)}...?`;
+      answer = sentence;
+    }
+    
+    return {
+      front: question,
+      back: answer,
+      type: 'question-answer'
+    };
+  }
+
+  private createTrueFalseCard(sentence: string): any {
+    const isTrue = Math.random() > 0.3; // Bias toward true statements
+    
+    if (isTrue) {
+      return {
+        front: sentence,
+        back: "True - This statement is accurate based on the study material.",
+        type: 'true-false'
+      };
+    } else {
+      // Create a false version by slight modification
+      const words = sentence.split(' ');
+      const modifiedSentence = words.map((word, index) => {
+        if (word.length > 4 && index > 0 && index < words.length - 1 && Math.random() > 0.7) {
+          return `[modified: ${word}]`;
+        }
+        return word;
+      }).join(' ');
+      
+      return {
+        front: modifiedSentence,
+        back: "False - This statement has been modified from the original material.",
+        type: 'true-false'
+      };
+    }
+  }
+
+  private createFillInBlankCard(sentence: string): any {
+    const words = sentence.split(' ');
+    const meaningfulWords = words.filter(word => 
+      word.length > 3 && 
+      !['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were'].includes(word.toLowerCase())
+    );
+    
+    if (meaningfulWords.length > 0) {
+      const importantWord = meaningfulWords[Math.floor(Math.random() * meaningfulWords.length)];
+      const blankSentence = sentence.replace(importantWord, '_____');
+      
+      return {
+        front: blankSentence,
+        back: importantWord,
+        type: 'fill-in-blank'
+      };
+    }
+    
+    return null;
   }
 
   // Generate quiz from content analysis
